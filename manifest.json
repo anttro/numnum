@@ -1,7 +1,7 @@
 {
   "name": "NumNum",
   "short_name": "NumNum",
-  "description": "Train your numeric systems",
+  "description": "Numeral systems trainer",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

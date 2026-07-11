@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=34">
+  <link rel="stylesheet" href="styles.css?v=35">
 </head>
 <body>
   <div id="app">
@@ -28,6 +28,7 @@
           <option value="en">English</option>
           <option value="ru">Русский</option>
         </select>
+        <button class="btn btn-secondary btn-large hidden" id="btn-install" data-i18n="installApp">Install App</button>
       </div>
     </div>
 
@@ -154,10 +155,10 @@
 
   </div>
 
-  <script type="module" src="app.js?v=34"></script>
+  <script type="module" src="app.js?v=35"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=34').catch(() => {});
+      navigator.serviceWorker.register('/sw.js?v=35').catch(() => {});
     }
   </script>
 </body>
