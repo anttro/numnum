@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=30">
+  <link rel="stylesheet" href="styles.css?v=34">
 </head>
 <body>
   <div id="app">
@@ -19,68 +19,72 @@
     <div id="screen-menu" class="screen active">
       <div class="menu-container">
         <h1 class="logo">NumNum</h1>
-        <p class="subtitle">Numeral systems trainer</p>
+        <p class="subtitle" data-i18n="subtitle">Numeral systems trainer</p>
         <div class="ticker-wrap">
           <div class="ticker" id="ticker"></div>
         </div>
-        <button class="btn btn-primary btn-large" id="btn-start">Start Game</button>
+        <button class="btn btn-primary btn-large" id="btn-start" data-i18n="startGame">Start Game</button>
+        <select id="lang-select" class="lang-select">
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+        </select>
       </div>
     </div>
 
     <!-- SETUP: SYSTEM SELECTION -->
     <div id="screen-setup-system" class="screen">
       <div class="setup-container">
-        <h2>Choose numeral system</h2>
+        <h2 data-i18n="chooseSystem">Choose numeral system</h2>
 
         <div class="system-group">
-          <h3>Positional</h3>
+          <h3 data-i18n="positional">Positional</h3>
           <div id="setup-systems-pos" class="option-grid"></div>
         </div>
 
         <div class="system-group">
-          <h3>Non-Positional</h3>
+          <h3 data-i18n="nonPositional">Non-Positional</h3>
           <div id="setup-systems-nonpos" class="option-grid"></div>
         </div>
 
-        <button class="btn btn-secondary" id="btn-system-back">Back</button>
+        <button class="btn btn-secondary" id="btn-system-back" data-i18n="back">Back</button>
       </div>
     </div>
 
     <!-- SETUP: RANGE SELECTION -->
     <div id="screen-setup-range" class="screen">
       <div class="setup-container">
-        <h2 id="range-title">Number Range</h2>
+        <h2 id="range-title" data-i18n="numberRange">Number Range</h2>
 
         <div class="setup-section">
           <div id="setup-ranges" class="option-grid"></div>
         </div>
 
-        <button class="btn btn-secondary" id="btn-range-back">Back</button>
+        <button class="btn btn-secondary" id="btn-range-back" data-i18n="back">Back</button>
       </div>
     </div>
 
     <!-- SETUP: OPTIONS (mode, timing, rounds) -->
     <div id="screen-setup-options" class="screen">
       <div class="setup-container">
-        <h2>Difficulty level</h2>
+        <h2 data-i18n="difficulty">Difficulty level</h2>
 
         <div class="setup-section">
-          <h3>Answer Mode</h3>
+          <h3 data-i18n="answerMode">Answer Mode</h3>
           <div id="setup-modes" class="option-grid"></div>
         </div>
 
         <div class="setup-section">
-          <h3>Time Limit</h3>
+          <h3 data-i18n="timeLimit">Time Limit</h3>
           <div id="setup-timing" class="option-grid"></div>
         </div>
 
         <div class="setup-section">
-          <h3>Number of Rounds</h3>
+          <h3 data-i18n="numberOfRounds">Number of Rounds</h3>
           <div id="setup-rounds" class="option-grid"></div>
         </div>
 
-        <button class="btn btn-primary btn-large" id="btn-play">Play!</button>
-        <button class="btn btn-secondary" id="btn-options-back">Back</button>
+        <button class="btn btn-primary btn-large" id="btn-play" data-i18n="play">Play!</button>
+        <button class="btn btn-secondary" id="btn-options-back" data-i18n="back">Back</button>
       </div>
     </div>
 
@@ -92,7 +96,7 @@
           <span id="score-system"></span>
         </div>
         <div class="timer-area" id="timer-area">
-          <span class="timer-label">Time left</span>
+          <span class="timer-label" data-i18n="timeLeft">Time left</span>
           <div class="timer-display" id="timer-display"></div>
         </div>
         <div class="header-right">
@@ -128,32 +132,32 @@
             <button class="numpad-key" data-key="0">0</button>
             <button class="numpad-key numpad-action" data-key="backspace">&#9003;</button>
           </div>
-          <button class="btn btn-primary hidden" id="btn-submit-answer">Submit</button>
+          <button class="btn btn-primary hidden" id="btn-submit-answer" data-i18n="submit">Submit</button>
         </div>
 
-        <button class="btn btn-primary hidden" id="btn-next">Next</button>
+        <button class="btn btn-primary hidden" id="btn-next" data-i18n="next">Next</button>
       </div>
     </div>
 
     <!-- RESULTS SCREEN -->
     <div id="screen-results" class="screen">
       <div class="results-container">
-        <h2>Results</h2>
+        <h2 data-i18n="results">Results</h2>
         <div class="results-summary" id="results-summary"></div>
         <div class="results-congrats" id="results-congrats"></div>
-        <h3 class="results-mistakes-label" id="results-mistakes-label">Mistakes</h3>
+        <h3 class="results-mistakes-label" id="results-mistakes-label" data-i18n="mistakes">Mistakes</h3>
         <div class="results-list" id="results-list"></div>
-        <button class="btn btn-primary btn-large" id="btn-play-again">Play Again</button>
-        <button class="btn btn-secondary btn-large" id="btn-results-menu">Menu</button>
+        <button class="btn btn-primary btn-large" id="btn-play-again" data-i18n="playAgain">Play Again</button>
+        <button class="btn btn-secondary btn-large" id="btn-results-menu" data-i18n="menu">Menu</button>
       </div>
     </div>
 
   </div>
 
-  <script type="module" src="app.js?v=30"></script>
+  <script type="module" src="app.js?v=34"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=30').catch(() => {});
+      navigator.serviceWorker.register('/sw.js?v=34').catch(() => {});
     }
   </script>
 </body>

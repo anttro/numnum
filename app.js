@@ -1,5 +1,107 @@
 import { SYSTEMS, generateChoices } from './numerals.js';
 
+let LANG = localStorage.getItem('numnum-lang') || (navigator.language.startsWith('ru') ? 'ru' : 'en');
+
+const STRINGS = {
+  en: {
+    subtitle: 'Numeral systems trainer',
+    startGame: 'Start Game',
+    chooseSystem: 'Choose numeral system',
+    positional: 'Positional',
+    nonPositional: 'Non-Positional',
+    back: 'Back',
+    numberRange: 'Number Range',
+    difficulty: 'Difficulty level',
+    answerMode: 'Answer Mode',
+    timeLimit: 'Time Limit',
+    numberOfRounds: 'Number of Rounds',
+    play: 'Play!',
+    timeLeft: 'Time left',
+    submit: 'Submit',
+    next: 'Next',
+    results: 'Results',
+    mistakes: 'Mistakes',
+    playAgain: 'Play Again',
+    menu: 'Menu',
+    choose: 'Choose',
+    type: 'Type',
+    noLimit: 'No limit',
+    correct: 'Correct!',
+    incorrect: 'Incorrect \u2014 answer: {n}',
+    timesUp: "Time's up! Answer: {n}",
+    pctCorrect: '{pct}% correct',
+    congratulations: 'Congratulations!',
+    pleaseSelect: 'Please select all options',
+    systemNames: {
+      binary: 'Binary', octal: 'Octal', hex: 'Hexadecimal',
+      ternary: 'Balanced Ternary', braille: 'Braille Decimal',
+      roman: 'Roman', slavonic: 'Church Slavonic',
+      greek: 'Greek', hebrew: 'Hebrew',
+    },
+  },
+  ru: {
+    subtitle: '\u0422\u0440\u0435\u043D\u0430\u0436\u0435\u0440 \u0441\u0438\u0441\u0442\u0435\u043C \u0441\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F',
+    startGame: '\u041D\u0430\u0447\u0430\u0442\u044C \u0438\u0433\u0440\u0443',
+    chooseSystem: '\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0438\u0441\u0442\u0435\u043C\u0443 \u0441\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F',
+    positional: '\u041F\u043E\u0437\u0438\u0446\u0438\u043E\u043D\u043D\u044B\u0435',
+    nonPositional: '\u041D\u0435\u043F\u043E\u0437\u0438\u0446\u0438\u043E\u043D\u043D\u044B\u0435',
+    back: '\u041D\u0430\u0437\u0430\u0434',
+    numberRange: '\u0414\u0438\u0430\u043F\u0430\u0437\u043E\u043D \u0447\u0438\u0441\u0435\u043B',
+    difficulty: '\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0441\u043B\u043E\u0436\u043D\u043E\u0441\u0442\u0438',
+    answerMode: '\u0420\u0435\u0436\u0438\u043C \u043E\u0442\u0432\u0435\u0442\u0430',
+    timeLimit: '\u041E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u0438\u0435 \u043F\u043E \u0432\u0440\u0435\u043C\u0435\u043D\u0438',
+    numberOfRounds: '\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0440\u0430\u0443\u043D\u0434\u043E\u0432',
+    play: '\u0418\u0433\u0440\u0430\u0442\u044C!',
+    timeLeft: '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C',
+    submit: '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C',
+    next: '\u0414\u0430\u043B\u0435\u0435',
+    results: '\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B',
+    mistakes: '\u041E\u0448\u0438\u0431\u043A\u0438',
+    playAgain: '\u0418\u0433\u0440\u0430\u0442\u044C \u0441\u043D\u043E\u0432\u0430',
+    menu: '\u041C\u0435\u043D\u044E',
+    choose: '\u0412\u044B\u0431\u043E\u0440',
+    type: '\u0412\u0432\u043E\u0434',
+    noLimit: '\u0411\u0435\u0437 \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u0438\u0439',
+    correct: '\u041F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u043E!',
+    incorrect: '\u041D\u0435\u0432\u0435\u0440\u043D\u043E \u2014 \u043E\u0442\u0432\u0435\u0442: {n}',
+    timesUp: '\u0412\u0440\u0435\u043C\u044F \u0432\u044B\u0448\u043B\u043E! \u041E\u0442\u0432\u0435\u0442: {n}',
+    pctCorrect: '{pct}% \u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u044B\u0445',
+    congratulations: '\u041F\u043E\u0437\u0434\u0440\u0430\u0432\u043B\u044F\u0435\u043C!',
+    pleaseSelect: '\u041F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0441\u0435 \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u044B',
+    systemNames: {
+      binary: '\u0414\u0432\u043E\u0438\u0447\u043D\u0430\u044F',
+      octal: '\u0412\u043E\u0441\u044C\u043C\u0435\u0440\u0438\u0447\u043D\u0430\u044F',
+      hex: '\u0428\u0435\u0441\u0442\u043D\u0430\u0434\u0446\u0430\u0442\u0435\u0440\u0438\u0447\u043D\u0430\u044F',
+      ternary: '\u0421\u0431\u0430\u043B\u0430\u043D\u0441\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u0430\u044F \u0442\u0440\u043E\u0438\u0447\u043D\u0430\u044F',
+      braille: '\u0414\u0435\u0441\u044F\u0442\u0438\u0447\u043D\u0430\u044F \u0411\u0440\u0430\u0439\u043B\u044F',
+      roman: '\u0420\u0438\u043C\u0441\u043A\u0430\u044F',
+      slavonic: '\u0426\u0435\u0440\u043A\u043E\u0432\u043D\u043E\u0441\u043B\u0430\u0432\u044F\u043D\u0441\u043A\u0430\u044F',
+      greek: '\u0413\u0440\u0435\u0447\u0435\u0441\u043A\u0430\u044F',
+      hebrew: '\u0415\u0432\u0440\u0435\u0439\u0441\u043A\u0430\u044F',
+    },
+  },
+};
+
+function t(key, params) {
+  let s = STRINGS[LANG][key] || STRINGS.en[key] || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      s = s.replace('{' + k + '}', v);
+    }
+  }
+  return s;
+}
+
+function systemName(key) {
+  return STRINGS[LANG].systemNames[key] || STRINGS.en.systemNames[key] || SYSTEMS[key].name;
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+}
+
 const SYSTEM_RANGES = {
   binary: [
     { label: '2\u2070 \u2013 2\u00B3', min: 1, max: 8 },
@@ -62,15 +164,15 @@ const SYSTEM_GROUPS = {
 };
 
 const MODES = [
-  { label: 'Choose', value: 'choice' },
-  { label: 'Type', value: 'manual' },
+  { labelKey: 'choose', value: 'choice' },
+  { labelKey: 'type', value: 'manual' },
 ];
 
 const TIMINGS = [
   { label: '60 sec', value: 60 },
   { label: '40 sec', value: 40 },
   { label: '10 sec', value: 10 },
-  { label: 'No limit', value: 0 },
+  { label: 'nolimit', value: 0 },
 ];
 
 const ROUNDS = [10, 25, 50, 100];
@@ -123,7 +225,7 @@ function renderSetupSystem() {
     keys.forEach(key => {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
-      btn.textContent = SYSTEMS[key].name;
+      btn.textContent = systemName(key);
       btn.addEventListener('click', () => {
         posDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
         nonposDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
@@ -141,7 +243,7 @@ function renderSetupSystem() {
 function renderSetupRange() {
   const ranges = SYSTEM_RANGES[setupState.system];
 
-  document.getElementById('range-title').textContent = 'Number Range — ' + SYSTEMS[setupState.system].name;
+  document.getElementById('range-title').textContent = t('numberRange') + ' \u2014 ' + systemName(setupState.system);
   const rangesDiv = document.getElementById('setup-ranges');
   rangesDiv.innerHTML = '';
   delete setupState.range;
@@ -178,7 +280,7 @@ function renderSetupOptions() {
   MODES.forEach((m, i) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn' + (i === defaultMode ? ' selected' : '');
-    btn.textContent = m.label;
+    btn.textContent = t(m.labelKey);
     btn.addEventListener('click', () => {
       modesDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
@@ -189,10 +291,10 @@ function renderSetupOptions() {
 
   const timingDiv = document.getElementById('setup-timing');
   timingDiv.innerHTML = '';
-  TIMINGS.forEach((t, i) => {
+  TIMINGS.forEach((tm, i) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn' + (i === defaultTiming ? ' selected' : '');
-    btn.textContent = t.label;
+    btn.textContent = tm.value === 0 ? t('noLimit') : tm.label;
     btn.addEventListener('click', () => {
       timingDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
@@ -231,7 +333,7 @@ function startGame() {
 
   document.getElementById('score-correct').textContent = '0';
   document.getElementById('score-total').textContent = '0';
-  document.getElementById('score-system').textContent = SYSTEMS[game.system].name;
+  document.getElementById('score-system').textContent = systemName(game.system);
 
   showScreen('game');
   nextRound();
@@ -299,18 +401,18 @@ function handleChoice(idx, val, choices) {
     game.correctCount++;
     document.getElementById('score-correct').textContent = game.correctCount;
     allBtns[idx].classList.add('correct-choice');
-    feedback.textContent = 'Correct!';
+    feedback.textContent = t('correct');
     feedback.className = 'answer-feedback correct';
   } else {
     allBtns[idx].classList.add('incorrect-choice');
     const correctIdx = choices.indexOf(game.correctAnswer);
     allBtns[correctIdx].classList.add('correct-choice');
-    feedback.textContent = `Incorrect — answer: ${game.correctAnswer}`;
+    feedback.textContent = t('incorrect', {n: game.correctAnswer});
     feedback.className = 'answer-feedback incorrect';
     game.mistakes.push({
       system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
       decimal: game.correctAnswer,
-      systemName: SYSTEMS[game.system].name,
+      systemName: systemName(game.system),
     });
   }
 
@@ -353,15 +455,15 @@ function renderNumpad() {
     if (val === game.correctAnswer) {
       game.correctCount++;
       document.getElementById('score-correct').textContent = game.correctCount;
-      feedback.textContent = 'Correct!';
+      feedback.textContent = t('correct');
       feedback.className = 'answer-feedback correct';
     } else {
-      feedback.textContent = `Incorrect — answer: ${game.correctAnswer}`;
+      feedback.textContent = t('incorrect', {n: game.correctAnswer});
       feedback.className = 'answer-feedback incorrect';
       game.mistakes.push({
         system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
         decimal: game.correctAnswer,
-        systemName: SYSTEMS[game.system].name,
+        systemName: systemName(game.system),
       });
     }
 
@@ -420,12 +522,12 @@ function startTimer() {
       if (!game.answered) {
         game.answered = true;
         const feedback = document.getElementById('answer-feedback');
-        feedback.textContent = `Time's up! Answer: ${game.correctAnswer}`;
+        feedback.textContent = t('timesUp', {n: game.correctAnswer});
         feedback.className = 'answer-feedback incorrect';
         game.mistakes.push({
           system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
           decimal: game.correctAnswer,
-          systemName: SYSTEMS[game.system].name,
+          systemName: systemName(game.system),
         });
 
         document.getElementById('btn-next').classList.remove('hidden');
@@ -458,14 +560,14 @@ function endGame() {
   const summary = document.getElementById('results-summary');
   summary.innerHTML = `
     <div class="big-number">${correct}/${total}</div>
-    <div>${pct}% correct</div>
+    <div>${t('pctCorrect', {pct: pct})}</div>
   `;
 
   const congratsEl = document.getElementById('results-congrats');
   const labelEl = document.getElementById('results-mistakes-label');
   const listEl = document.getElementById('results-list');
   congratsEl.innerHTML = '';
-  labelEl.textContent = 'Mistakes';
+  labelEl.textContent = t('mistakes');
   labelEl.style.display = '';
   listEl.innerHTML = '';
 
@@ -482,7 +584,7 @@ function endGame() {
     });
   } else if (completed) {
     labelEl.style.display = 'none';
-    congratsEl.textContent = 'Congratulations!';
+    congratsEl.textContent = t('congratulations');
     spawnConfetti();
   } else {
     labelEl.style.display = 'none';
@@ -555,6 +657,16 @@ function generateTickerText() {
 const tickerText = generateTickerText();
 document.getElementById('ticker').innerHTML = tickerText + '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + tickerText;
 
+const langSelect = document.getElementById('lang-select');
+langSelect.value = LANG;
+langSelect.addEventListener('change', () => {
+  LANG = langSelect.value;
+  localStorage.setItem('numnum-lang', LANG);
+  applyTranslations();
+});
+
+applyTranslations();
+
 function showSetupMessage(msg) {
   const containers = document.querySelectorAll('.setup-container');
   let el = document.getElementById('setup-message');
@@ -589,7 +701,7 @@ document.getElementById('btn-options-back').addEventListener('click', () => {
 
 document.getElementById('btn-play').addEventListener('click', () => {
   if (setupState.mode === undefined || setupState.timing === undefined || setupState.rounds === undefined) {
-    showSetupMessage('Please select all options');
+    showSetupMessage(t('pleaseSelect'));
     return;
   }
   startGame();
