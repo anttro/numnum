@@ -1,0 +1,643 @@
+import { SYSTEMS, generateChoices } from './numerals.js';
+
+const SYSTEM_RANGES = {
+  binary: [
+    { label: '2\u2070 \u2013 2\u00B3', min: 1, max: 8 },
+    { label: '2\u00B3 \u2013 2\u2077', min: 8, max: 128 },
+    { label: '2\u2070 \u2013 2\u2077', min: 1, max: 128 },
+    { label: '2\u2070 \u2013 2\u00B9\u2075', min: 1, max: 32768 },
+  ],
+  ternary: [
+    { label: '3\u2070 \u2013 3\u00B9', min: 1, max: 3 },
+    { label: '\u20133\u00B9 \u2013 3\u00B9', min: -3, max: 3 },
+    { label: '\u20133\u00B2 \u2013 3\u00B2', min: -9, max: 9 },
+    { label: '\u20133\u00B3 \u2013 3\u00B3', min: -27, max: 27 },
+  ],
+  octal: [
+    { label: '8\u2070 \u2013 8\u00B9', min: 1, max: 8 },
+    { label: '8\u00B2 \u2013 8\u00B3', min: 64, max: 512 },
+    { label: '8\u2070 \u2013 8\u00B3', min: 1, max: 512 },
+    { label: '8\u2070 \u2013 8\u2074', min: 1, max: 4096 },
+  ],
+  hex: [
+    { label: 'F\u2070 \u2013 F\u00B9', min: 1, max: 16 },
+    { label: 'F\u2070 \u2013 F\u00B2', min: 1, max: 256 },
+    { label: 'F\u00B2 \u2013 F\u2074', min: 256, max: 65536 },
+    { label: 'F\u2070 \u2013 F\u2074', min: 1, max: 65536 },
+  ],
+  braille: [
+    { label: '0 \u2013 9', min: 0, max: 9 },
+    { label: '10 \u2013 99', min: 10, max: 99 },
+    { label: '100 \u2013 999', min: 100, max: 999 },
+    { label: '0 \u2013 9999', min: 0, max: 9999 },
+  ],
+  roman: [
+    { label: '1 \u2013 9', min: 1, max: 9 },
+    { label: '10 \u2013 99', min: 10, max: 99 },
+    { label: '100 \u2013 999', min: 100, max: 999 },
+    { label: '1000 \u2013 3999', min: 1000, max: 3999 },
+  ],
+  greek: [
+    { label: '1 \u2013 9', min: 1, max: 9 },
+    { label: '10 \u2013 99', min: 10, max: 99 },
+    { label: '100 \u2013 999', min: 100, max: 999 },
+    { label: '1000 \u2013 9999', min: 1000, max: 9999 },
+  ],
+  slavonic: [
+    { label: '1 \u2013 9', min: 1, max: 9 },
+    { label: '10 \u2013 99', min: 10, max: 99 },
+    { label: '100 \u2013 999', min: 100, max: 999 },
+    { label: '1000 \u2013 9999', min: 1000, max: 9999 },
+  ],
+  hebrew: [
+    { label: '1 \u2013 9', min: 1, max: 9 },
+    { label: '10 \u2013 99', min: 10, max: 99 },
+    { label: '100 \u2013 499', min: 100, max: 499 },
+  ],
+};
+
+const SYSTEM_GROUPS = {
+  pos: ['binary', 'octal', 'hex', 'ternary', 'braille'],
+  nonpos: ['roman', 'greek', 'slavonic', 'hebrew'],
+};
+
+const MODES = [
+  { label: 'Choose', value: 'choice' },
+  { label: 'Type', value: 'manual' },
+];
+
+const TIMINGS = [
+  { label: '60 sec', value: 60 },
+  { label: '40 sec', value: 40 },
+  { label: '10 sec', value: 10 },
+  { label: 'No limit', value: 0 },
+];
+
+const ROUNDS = [10, 25, 50, 100];
+
+let game = {
+  system: null,
+  range: null,
+  mode: null,
+  timing: null,
+  rounds: null,
+  currentRound: 0,
+  correctCount: 0,
+  correctAnswer: null,
+  answered: false,
+  timerInterval: null,
+  timeLeft: 0,
+  mistakes: [],
+};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function randInt(min, max) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+// ---- SETUP ----
+let setupState = {};
+
+function renderSetupSystem() {
+  setupState = {};
+  const posDiv = document.getElementById('setup-systems-pos');
+  const nonposDiv = document.getElementById('setup-systems-nonpos');
+  posDiv.innerHTML = '';
+  nonposDiv.innerHTML = '';
+
+  for (const [group, keys] of Object.entries(SYSTEM_GROUPS)) {
+    const target = group === 'pos' ? posDiv : nonposDiv;
+    keys.forEach(key => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = SYSTEMS[key].name;
+      btn.addEventListener('click', () => {
+        posDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        nonposDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        setupState.system = key;
+        renderSetupRange();
+      });
+      target.appendChild(btn);
+    });
+  }
+
+  showScreen('setup-system');
+}
+
+function renderSetupRange() {
+  const ranges = SYSTEM_RANGES[setupState.system];
+
+  document.getElementById('range-title').textContent = 'Number Range — ' + SYSTEMS[setupState.system].name;
+  const rangesDiv = document.getElementById('setup-ranges');
+  rangesDiv.innerHTML = '';
+  delete setupState.range;
+  delete setupState.rangeData;
+
+  ranges.forEach((r, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = r.label;
+    btn.addEventListener('click', () => {
+      rangesDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      setupState.range = i;
+      setupState.rangeData = r;
+      renderSetupOptions();
+    });
+    rangesDiv.appendChild(btn);
+  });
+
+  showScreen('setup-range');
+}
+
+function renderSetupOptions() {
+  const defaultMode = 0;
+  const defaultTiming = 3;
+  const defaultRounds = 0;
+
+  setupState.mode = defaultMode;
+  setupState.timing = defaultTiming;
+  setupState.rounds = defaultRounds;
+
+  const modesDiv = document.getElementById('setup-modes');
+  modesDiv.innerHTML = '';
+  MODES.forEach((m, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (i === defaultMode ? ' selected' : '');
+    btn.textContent = m.label;
+    btn.addEventListener('click', () => {
+      modesDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      setupState.mode = i;
+    });
+    modesDiv.appendChild(btn);
+  });
+
+  const timingDiv = document.getElementById('setup-timing');
+  timingDiv.innerHTML = '';
+  TIMINGS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (i === defaultTiming ? ' selected' : '');
+    btn.textContent = t.label;
+    btn.addEventListener('click', () => {
+      timingDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      setupState.timing = i;
+    });
+    timingDiv.appendChild(btn);
+  });
+
+  const roundsDiv = document.getElementById('setup-rounds');
+  roundsDiv.innerHTML = '';
+  ROUNDS.forEach((r, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (i === defaultRounds ? ' selected' : '');
+    btn.textContent = String(r);
+    btn.addEventListener('click', () => {
+      roundsDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      setupState.rounds = i;
+    });
+    roundsDiv.appendChild(btn);
+  });
+
+  showScreen('setup-options');
+}
+
+// ---- GAME ----
+function startGame() {
+  game.system = setupState.system;
+  game.range = setupState.rangeData || RANGES[setupState.range];
+  game.mode = MODES[setupState.mode]?.value ?? setupState.mode;
+  game.timing = TIMINGS[setupState.timing]?.value ?? setupState.timing;
+  game.rounds = ROUNDS[setupState.rounds];
+  game.currentRound = 0;
+  game.correctCount = 0;
+  game.mistakes = [];
+
+  document.getElementById('score-correct').textContent = '0';
+  document.getElementById('score-total').textContent = '0';
+  document.getElementById('score-system').textContent = SYSTEMS[game.system].name;
+
+  showScreen('game');
+  nextRound();
+}
+
+function nextRound() {
+  if (game.currentRound >= game.rounds) {
+    endGame();
+    return;
+  }
+
+  game.currentRound++;
+  game.answered = false;
+  game.correctAnswer = randInt(game.range.min, game.range.max);
+
+  document.getElementById('score-total').textContent = game.currentRound;
+  document.getElementById('score-correct').textContent = game.correctCount;
+
+  const display = SYSTEMS[game.system].toDisplay(game.correctAnswer);
+  const numEl = document.getElementById('number-display');
+  numEl.textContent = display;
+  numEl.classList.toggle('small-text', display.length > 12);
+  numEl.classList.toggle('slavonic-font', game.system === 'slavonic');
+
+  document.getElementById('answer-feedback').textContent = '';
+  document.getElementById('answer-feedback').className = 'answer-feedback';
+  document.getElementById('btn-next').classList.add('hidden');
+
+  if (game.mode === 'choice') {
+    renderChoices();
+  } else {
+    renderNumpad();
+  }
+
+  startTimer();
+}
+
+function renderChoices() {
+  const choiceArea = document.getElementById('choice-area');
+  const numpadArea = document.getElementById('numpad-area');
+  choiceArea.classList.remove('hidden');
+  numpadArea.classList.add('hidden');
+
+  const choices = generateChoices(game.correctAnswer, [game.range.min, game.range.max], 3);
+  choices.forEach((val, i) => {
+    const btn = document.getElementById('choice-' + i);
+    btn.textContent = val;
+    btn.className = 'choice-btn';
+    btn.disabled = false;
+    btn.onclick = () => handleChoice(i, val, choices);
+  });
+}
+
+function handleChoice(idx, val, choices) {
+  if (game.answered) return;
+  game.answered = true;
+  stopTimer();
+
+  const feedback = document.getElementById('answer-feedback');
+  const allBtns = choices.map((_, i) => document.getElementById('choice-' + i));
+
+  allBtns.forEach(b => b.disabled = true);
+
+  if (val === game.correctAnswer) {
+    game.correctCount++;
+    document.getElementById('score-correct').textContent = game.correctCount;
+    allBtns[idx].classList.add('correct-choice');
+    feedback.textContent = 'Correct!';
+    feedback.className = 'answer-feedback correct';
+  } else {
+    allBtns[idx].classList.add('incorrect-choice');
+    const correctIdx = choices.indexOf(game.correctAnswer);
+    allBtns[correctIdx].classList.add('correct-choice');
+    feedback.textContent = `Incorrect — answer: ${game.correctAnswer}`;
+    feedback.className = 'answer-feedback incorrect';
+    game.mistakes.push({
+      system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
+      decimal: game.correctAnswer,
+      systemName: SYSTEMS[game.system].name,
+    });
+  }
+
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function renderNumpad() {
+  const choiceArea = document.getElementById('choice-area');
+  const numpadArea = document.getElementById('numpad-area');
+  choiceArea.classList.add('hidden');
+  numpadArea.classList.remove('hidden');
+
+  const inputEl = document.getElementById('numpad-input');
+  inputEl.textContent = '';
+
+  const clearBtn = numpadArea.querySelector('[data-key="clear"]');
+  if (game.system === 'ternary') {
+    clearBtn.textContent = '±';
+    clearBtn.dataset.key = 'sign';
+  } else {
+    clearBtn.textContent = 'C';
+    clearBtn.dataset.key = 'clear';
+  }
+
+  document.getElementById('btn-submit-answer').classList.remove('hidden');
+
+  numpadArea.querySelectorAll('.numpad-key').forEach(key => {
+    key.onclick = () => handleNumpadKey(key.dataset.key);
+  });
+
+  document.getElementById('btn-submit-answer').onclick = () => {
+    if (game.answered) return;
+    const val = parseInt(inputEl.textContent, 10);
+    if (isNaN(val)) return;
+    game.answered = true;
+    stopTimer();
+    document.getElementById('btn-submit-answer').classList.add('hidden');
+
+    const feedback = document.getElementById('answer-feedback');
+    if (val === game.correctAnswer) {
+      game.correctCount++;
+      document.getElementById('score-correct').textContent = game.correctCount;
+      feedback.textContent = 'Correct!';
+      feedback.className = 'answer-feedback correct';
+    } else {
+      feedback.textContent = `Incorrect — answer: ${game.correctAnswer}`;
+      feedback.className = 'answer-feedback incorrect';
+      game.mistakes.push({
+        system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
+        decimal: game.correctAnswer,
+        systemName: SYSTEMS[game.system].name,
+      });
+    }
+
+    document.getElementById('btn-next').classList.remove('hidden');
+  };
+}
+
+function handleNumpadKey(key) {
+  const inputEl = document.getElementById('numpad-input');
+  if (game.answered) return;
+
+  if (key === 'clear') {
+    inputEl.textContent = '';
+  } else if (key === 'backspace') {
+    inputEl.textContent = inputEl.textContent.slice(0, -1);
+  } else if (key === 'sign') {
+    if (inputEl.textContent.startsWith('-')) {
+      inputEl.textContent = inputEl.textContent.slice(1);
+    } else {
+      inputEl.textContent = '-' + inputEl.textContent;
+    }
+  } else {
+    if (inputEl.textContent.length < 12) {
+      inputEl.textContent += key;
+    }
+  }
+}
+
+function startTimer() {
+  stopTimer();
+  const timerEl = document.getElementById('timer-display');
+  const timerArea = document.getElementById('timer-area');
+
+  if (game.timing === 0) {
+    timerEl.textContent = '';
+    timerEl.classList.remove('urgent');
+    timerArea.classList.remove('visible');
+    return;
+  }
+
+  timerArea.classList.add('visible');
+  game.timeLeft = game.timing;
+  timerEl.textContent = game.timeLeft + 's';
+  timerEl.classList.remove('urgent');
+
+  game.timerInterval = setInterval(() => {
+    game.timeLeft--;
+    timerEl.textContent = game.timeLeft + 's';
+
+    if (game.timeLeft <= 10) {
+      timerEl.classList.add('urgent');
+    }
+
+    if (game.timeLeft <= 0) {
+      stopTimer();
+      if (!game.answered) {
+        game.answered = true;
+        const feedback = document.getElementById('answer-feedback');
+        feedback.textContent = `Time's up! Answer: ${game.correctAnswer}`;
+        feedback.className = 'answer-feedback incorrect';
+        game.mistakes.push({
+          system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
+          decimal: game.correctAnswer,
+          systemName: SYSTEMS[game.system].name,
+        });
+
+        document.getElementById('btn-next').classList.remove('hidden');
+
+        if (game.mode === 'choice') {
+          document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+        }
+      }
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (game.timerInterval) {
+    clearInterval(game.timerInterval);
+    game.timerInterval = null;
+  }
+  document.getElementById('timer-display').classList.remove('urgent');
+}
+
+function endGame() {
+  stopTimer();
+  showScreen('results');
+
+  const completed = game.currentRound >= game.rounds;
+  const total = completed ? game.rounds : game.currentRound;
+  const correct = game.correctCount;
+  const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+  const summary = document.getElementById('results-summary');
+  summary.innerHTML = `
+    <div class="big-number">${correct}/${total}</div>
+    <div>${pct}% correct</div>
+  `;
+
+  const congratsEl = document.getElementById('results-congrats');
+  const labelEl = document.getElementById('results-mistakes-label');
+  const listEl = document.getElementById('results-list');
+  congratsEl.innerHTML = '';
+  labelEl.textContent = 'Mistakes';
+  labelEl.style.display = '';
+  listEl.innerHTML = '';
+
+  if (game.mistakes.length > 0) {
+    game.mistakes.forEach(m => {
+      const item = document.createElement('div');
+      item.className = 'result-item';
+      item.innerHTML = `
+        <div class="result-system">${m.system}</div>
+        <div class="result-arrow">\u2192</div>
+        <div class="result-decimal">${m.decimal}</div>
+      `;
+      listEl.appendChild(item);
+    });
+  } else if (completed) {
+    labelEl.style.display = 'none';
+    congratsEl.textContent = 'Congratulations!';
+    spawnConfetti();
+  } else {
+    labelEl.style.display = 'none';
+  }
+}
+
+function spawnConfetti() {
+  const chars = ['🎉', '🎊', '✨', '🎈', '🥳', '💫'];
+  const container = document.getElementById('results-congrats');
+
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const burst = document.createElement('div');
+      burst.className = 'confetti-burst';
+      burst.style.left = 15 + Math.random() * 70 + '%';
+      burst.style.top = 20 + Math.random() * 40 + '%';
+
+      for (let j = 0; j < 12; j++) {
+        const particle = document.createElement('span');
+        particle.className = 'confetti-particle';
+        particle.textContent = chars[Math.floor(Math.random() * chars.length)];
+        particle.style.setProperty('--dx', (Math.random() - 0.5) * 120 + 'px');
+        particle.style.setProperty('--dy', -(40 + Math.random() * 80) + 'px');
+        particle.style.setProperty('--rot', Math.random() * 360 + 'deg');
+        particle.style.animationDuration = (0.6 + Math.random() * 0.4) + 's';
+        burst.appendChild(particle);
+      }
+
+      container.appendChild(burst);
+      setTimeout(() => burst.remove(), 1200);
+    }, i * 500);
+  }
+}
+
+// ---- INIT ----
+
+const SUBSCRIPTS = { '0':'\u2080', '1':'\u2081', '2':'\u2082', '3':'\u2083',
+  '4':'\u2084', '5':'\u2085', '6':'\u2086', '7':'\u2087', '8':'\u2088', '9':'\u2089' };
+
+function toSubscript(n) {
+  return String(n).split('').map(d => SUBSCRIPTS[d]).join('');
+}
+
+const TICKER_SYSTEMS = [
+  { key: 'binary',    min: 1,   max: 255,  prefix: toSubscript(2) },
+  { key: 'octal',     min: 1,   max: 511,  prefix: toSubscript(8) },
+  { key: 'hex',       min: 1,   max: 255,  prefix: '0x' },
+  { key: 'ternary',   min: 1,   max: 27,   prefix: toSubscript(3) },
+  { key: 'braille',   min: 1,   max: 99,   prefix: null },
+  { key: 'roman',     min: 1,   max: 3999, prefix: null },
+  { key: 'greek',     min: 1,   max: 999,  prefix: null },
+  { key: 'slavonic',  min: 1,   max: 999,  prefix: null },
+];
+
+function generateTickerText() {
+  const pairs = [];
+  for (let i = 0; i < 20; i++) {
+    const sys = TICKER_SYSTEMS[Math.floor(Math.random() * TICKER_SYSTEMS.length)];
+    const num = sys.min + Math.floor(Math.random() * (sys.max - sys.min + 1));
+    const display = SYSTEMS[sys.key].toDisplay(num);
+    const prefixed = sys.prefix ? sys.prefix + display : display;
+    const wrapped = sys.key === 'slavonic'
+      ? '<span class="slavonic-font">' + prefixed + '</span>'
+      : prefixed;
+    pairs.push(wrapped + ' = ' + num);
+  }
+  return pairs.join('\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0');
+}
+
+const tickerText = generateTickerText();
+document.getElementById('ticker').innerHTML = tickerText + '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + tickerText;
+
+function showSetupMessage(msg) {
+  const containers = document.querySelectorAll('.setup-container');
+  let el = document.getElementById('setup-message');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'setup-message';
+    el.className = 'setup-message';
+  }
+  containers.forEach(c => {
+    if (!c.contains(el)) c.prepend(el);
+  });
+  el.textContent = msg;
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 2500);
+}
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  renderSetupSystem();
+});
+
+document.getElementById('btn-system-back').addEventListener('click', () => {
+  showScreen('menu');
+});
+
+document.getElementById('btn-range-back').addEventListener('click', () => {
+  renderSetupSystem();
+});
+
+document.getElementById('btn-options-back').addEventListener('click', () => {
+  renderSetupRange();
+});
+
+document.getElementById('btn-play').addEventListener('click', () => {
+  if (setupState.mode === undefined || setupState.timing === undefined || setupState.rounds === undefined) {
+    showSetupMessage('Please select all options');
+    return;
+  }
+  startGame();
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  nextRound();
+});
+
+document.getElementById('btn-play-again').addEventListener('click', () => {
+  renderSetupSystem();
+});
+
+document.getElementById('btn-results-menu').addEventListener('click', () => {
+  showScreen('menu');
+});
+
+document.getElementById('btn-stop').addEventListener('click', () => {
+  stopTimer();
+  endGame();
+});
+
+// Keyboard support for numpad
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('screen-game').classList.contains('active')) return;
+  if (game.answered) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      nextRound();
+    }
+    return;
+  }
+
+  if (game.mode === 'manual') {
+    if (e.key >= '0' && e.key <= '9') {
+      handleNumpadKey(e.key);
+    } else if (e.key === 'Backspace') {
+      handleNumpadKey('backspace');
+    } else if (e.key === 'Escape') {
+      handleNumpadKey('clear');
+    } else if (e.key === 'Enter') {
+      document.getElementById('btn-submit-answer').click();
+    }
+  } else if (game.mode === 'choice') {
+    if (e.key === '1' || e.key === '2' || e.key === '3') {
+      const idx = parseInt(e.key) - 1;
+      const btn = document.getElementById('choice-' + idx);
+      if (btn && !btn.disabled) btn.click();
+    }
+  }
+});

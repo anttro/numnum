@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>NumNum</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css?v=30">
+</head>
+<body>
+  <div id="app">
+
+    <!-- MENU SCREEN -->
+    <div id="screen-menu" class="screen active">
+      <div class="menu-container">
+        <h1 class="logo">NumNum</h1>
+        <p class="subtitle">Numeral systems trainer</p>
+        <div class="ticker-wrap">
+          <div class="ticker" id="ticker"></div>
+        </div>
+        <button class="btn btn-primary btn-large" id="btn-start">Start Game</button>
+      </div>
+    </div>
+
+    <!-- SETUP: SYSTEM SELECTION -->
+    <div id="screen-setup-system" class="screen">
+      <div class="setup-container">
+        <h2>Choose numeral system</h2>
+
+        <div class="system-group">
+          <h3>Positional</h3>
+          <div id="setup-systems-pos" class="option-grid"></div>
+        </div>
+
+        <div class="system-group">
+          <h3>Non-Positional</h3>
+          <div id="setup-systems-nonpos" class="option-grid"></div>
+        </div>
+
+        <button class="btn btn-secondary" id="btn-system-back">Back</button>
+      </div>
+    </div>
+
+    <!-- SETUP: RANGE SELECTION -->
+    <div id="screen-setup-range" class="screen">
+      <div class="setup-container">
+        <h2 id="range-title">Number Range</h2>
+
+        <div class="setup-section">
+          <div id="setup-ranges" class="option-grid"></div>
+        </div>
+
+        <button class="btn btn-secondary" id="btn-range-back">Back</button>
+      </div>
+    </div>
+
+    <!-- SETUP: OPTIONS (mode, timing, rounds) -->
+    <div id="screen-setup-options" class="screen">
+      <div class="setup-container">
+        <h2>Difficulty level</h2>
+
+        <div class="setup-section">
+          <h3>Answer Mode</h3>
+          <div id="setup-modes" class="option-grid"></div>
+        </div>
+
+        <div class="setup-section">
+          <h3>Time Limit</h3>
+          <div id="setup-timing" class="option-grid"></div>
+        </div>
+
+        <div class="setup-section">
+          <h3>Number of Rounds</h3>
+          <div id="setup-rounds" class="option-grid"></div>
+        </div>
+
+        <button class="btn btn-primary btn-large" id="btn-play">Play!</button>
+        <button class="btn btn-secondary" id="btn-options-back">Back</button>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="screen-game" class="screen">
+      <div class="game-header">
+        <div class="score-display">
+          <span id="score-correct">0</span>/<span id="score-total">0</span>
+          <span id="score-system"></span>
+        </div>
+        <div class="timer-area" id="timer-area">
+          <span class="timer-label">Time left</span>
+          <div class="timer-display" id="timer-display"></div>
+        </div>
+        <div class="header-right">
+          <button class="btn-stop" id="btn-stop">&times;</button>
+        </div>
+      </div>
+
+      <div class="game-body">
+        <div class="number-display" id="number-display"></div>
+        <div class="answer-feedback" id="answer-feedback"></div>
+
+        <!-- Choice mode -->
+        <div id="choice-area" class="choice-area hidden">
+          <button class="choice-btn" id="choice-0"></button>
+          <button class="choice-btn" id="choice-1"></button>
+          <button class="choice-btn" id="choice-2"></button>
+        </div>
+
+        <!-- Manual entry mode -->
+        <div id="numpad-area" class="numpad-area hidden">
+          <div class="numpad-input" id="numpad-input"></div>
+          <div class="numpad">
+            <button class="numpad-key" data-key="1">1</button>
+            <button class="numpad-key" data-key="2">2</button>
+            <button class="numpad-key" data-key="3">3</button>
+            <button class="numpad-key" data-key="4">4</button>
+            <button class="numpad-key" data-key="5">5</button>
+            <button class="numpad-key" data-key="6">6</button>
+            <button class="numpad-key" data-key="7">7</button>
+            <button class="numpad-key" data-key="8">8</button>
+            <button class="numpad-key" data-key="9">9</button>
+            <button class="numpad-key numpad-action" data-key="clear">C</button>
+            <button class="numpad-key" data-key="0">0</button>
+            <button class="numpad-key numpad-action" data-key="backspace">&#9003;</button>
+          </div>
+          <button class="btn btn-primary hidden" id="btn-submit-answer">Submit</button>
+        </div>
+
+        <button class="btn btn-primary hidden" id="btn-next">Next</button>
+      </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="screen-results" class="screen">
+      <div class="results-container">
+        <h2>Results</h2>
+        <div class="results-summary" id="results-summary"></div>
+        <div class="results-congrats" id="results-congrats"></div>
+        <h3 class="results-mistakes-label" id="results-mistakes-label">Mistakes</h3>
+        <div class="results-list" id="results-list"></div>
+        <button class="btn btn-primary btn-large" id="btn-play-again">Play Again</button>
+        <button class="btn btn-secondary btn-large" id="btn-results-menu">Menu</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="app.js?v=30"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js?v=30').catch(() => {});
+    }
+  </script>
+</body>
+</html>
