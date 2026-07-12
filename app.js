@@ -148,7 +148,6 @@ const SYSTEM_RANGES = {
     { label: '10 \u2013 19', min: 10, max: 19 },
     { label: '20 \u2013 99', min: 20, max: 99 },
     { label: '1 \u2013 99', min: 1, max: 99 },
-    { label: '10 \u2013 99', min: 10, max: 99 },
     { label: '100 \u2013 999', min: 100, max: 999 },
     { label: '1000 \u2013 9999', min: 1000, max: 9999 },
   ],
@@ -157,7 +156,6 @@ const SYSTEM_RANGES = {
     { label: '10 \u2013 19', min: 10, max: 19 },
     { label: '20 \u2013 99', min: 20, max: 99 },
     { label: '1 \u2013 99', min: 1, max: 99 },
-    { label: '10 \u2013 99', min: 10, max: 99 },
     { label: '100 \u2013 999', min: 100, max: 999 },
     { label: '1000 \u2013 9999', min: 1000, max: 9999 },
   ],
@@ -166,7 +164,6 @@ const SYSTEM_RANGES = {
     { label: '10 \u2013 19', min: 10, max: 19 },
     { label: '20 \u2013 99', min: 20, max: 99 },
     { label: '1 \u2013 99', min: 1, max: 99 },
-    { label: '10 \u2013 99', min: 10, max: 99 },
     { label: '100 \u2013 499', min: 100, max: 499 },
   ],
 };
