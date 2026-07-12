@@ -34,6 +34,8 @@ const STRINGS = {
     pleaseSelect: 'Please select all options',
     installApp: 'Install App',
     sec: 'sec',
+    chooseAnswer: 'Choose answer',
+    enterEquivalent: 'Enter equivalent',
     systemNames: {
       binary: 'Binary', octal: 'Octal', hex: 'Hexadecimal',
       ternary: 'Balanced Ternary', braille: 'Braille Decimal',
@@ -72,6 +74,8 @@ const STRINGS = {
     pleaseSelect: '\u041F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0441\u0435 \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u044B',
     installApp: '\u0423\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435',
     sec: '\u0441\u0435\u043A',
+    chooseAnswer: '\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043E\u0442\u0432\u0435\u0442',
+    enterEquivalent: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0447\u0438\u0441\u043B\u043E',
     systemNames: {
       binary: '\u0414\u0432\u043E\u0438\u0447\u043D\u0430\u044F',
       octal: '\u0412\u043E\u0441\u044C\u043C\u0435\u0440\u0438\u0447\u043D\u0430\u044F',
@@ -379,9 +383,11 @@ function nextRound() {
   numEl.textContent = display;
   numEl.classList.toggle('small-text', display.length > 12);
   numEl.classList.toggle('slavonic-font', game.system === 'slavonic');
+  numEl.classList.toggle('mono', SYSTEM_GROUPS.pos.includes(game.system));
 
-  document.getElementById('answer-feedback').textContent = '';
-  document.getElementById('answer-feedback').className = 'answer-feedback';
+  const feedback = document.getElementById('answer-feedback');
+  feedback.textContent = game.mode === 'choice' ? t('chooseAnswer') : t('enterEquivalent');
+  feedback.className = 'answer-feedback';
   document.getElementById('btn-next').classList.add('hidden');
 
   if (game.mode === 'choice') {
