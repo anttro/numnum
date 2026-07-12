@@ -1,4 +1,4 @@
-const CACHE_NAME = 'numnum-v46';
+const CACHE_NAME = 'numnum-v8';
 const ASSETS = [
   '/',
   '/index.html',

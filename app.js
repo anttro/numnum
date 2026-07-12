@@ -76,7 +76,7 @@ const STRINGS = {
       binary: '\u0414\u0432\u043E\u0438\u0447\u043D\u0430\u044F',
       octal: '\u0412\u043E\u0441\u044C\u043C\u0435\u0440\u0438\u0447\u043D\u0430\u044F',
       hex: '\u0428\u0435\u0441\u0442\u043D\u0430\u0434\u0446\u0430\u0442\u0435\u0440\u0438\u0447\u043D\u0430\u044F',
-      ternary: '\u0421\u0431\u0430\u043B\u0430\u043D\u0441\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u0430\u044F \u0442\u0440\u043E\u0438\u0447\u043D\u0430\u044F',
+      ternary: '\u0423\u0440\u0430\u0432\u043D\u043E\u0432\u0435\u0448\u0435\u043D\u043D\u0430\u044F \u0442\u0440\u043E\u0438\u0447\u043D\u0430\u044F',
       braille: '\u0414\u0435\u0441\u044F\u0442\u0438\u0447\u043D\u0430\u044F \u0411\u0440\u0430\u0439\u043B\u044F',
       roman: '\u0420\u0438\u043C\u0441\u043A\u0430\u044F',
       slavonic: '\u0426\u0435\u0440\u043A\u043E\u0432\u043D\u043E\u0441\u043B\u0430\u0432\u044F\u043D\u0441\u043A\u0430\u044F',
@@ -145,18 +145,27 @@ const SYSTEM_RANGES = {
   ],
   greek: [
     { label: '1 \u2013 9', min: 1, max: 9 },
+    { label: '10 \u2013 19', min: 10, max: 19 },
+    { label: '20 \u2013 99', min: 20, max: 99 },
+    { label: '1 \u2013 99', min: 1, max: 99 },
     { label: '10 \u2013 99', min: 10, max: 99 },
     { label: '100 \u2013 999', min: 100, max: 999 },
     { label: '1000 \u2013 9999', min: 1000, max: 9999 },
   ],
   slavonic: [
     { label: '1 \u2013 9', min: 1, max: 9 },
+    { label: '10 \u2013 19', min: 10, max: 19 },
+    { label: '20 \u2013 99', min: 20, max: 99 },
+    { label: '1 \u2013 99', min: 1, max: 99 },
     { label: '10 \u2013 99', min: 10, max: 99 },
     { label: '100 \u2013 999', min: 100, max: 999 },
     { label: '1000 \u2013 9999', min: 1000, max: 9999 },
   ],
   hebrew: [
     { label: '1 \u2013 9', min: 1, max: 9 },
+    { label: '10 \u2013 19', min: 10, max: 19 },
+    { label: '20 \u2013 99', min: 20, max: 99 },
+    { label: '1 \u2013 99', min: 1, max: 99 },
     { label: '10 \u2013 99', min: 10, max: 99 },
     { label: '100 \u2013 499', min: 100, max: 499 },
   ],
@@ -173,10 +182,10 @@ const MODES = [
 ];
 
 const TIMINGS = [
-  { value: 60 },
-  { value: 40 },
-  { value: 10 },
   { value: 0 },
+  { value: 30 },
+  { value: 15 },
+  { value: 5 },
 ];
 
 const ROUNDS = [10, 25, 50, 100];
@@ -272,7 +281,7 @@ function renderSetupRange() {
 
 function renderSetupOptions() {
   const defaultMode = 0;
-  const defaultTiming = 3;
+  const defaultTiming = 0;
   const defaultRounds = 0;
 
   setupState.mode = defaultMode;
@@ -420,6 +429,8 @@ function handleChoice(idx, val, choices) {
     allBtns[idx].classList.add('correct-choice');
     feedback.textContent = t('correct');
     feedback.className = 'answer-feedback correct';
+    const rect = allBtns[idx].getBoundingClientRect();
+    spawnAnswerConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
   } else {
     allBtns[idx].classList.add('incorrect-choice');
     const correctIdx = choices.indexOf(game.correctAnswer);
@@ -475,6 +486,8 @@ function renderNumpad() {
     document.getElementById('score-correct').textContent = MARK_CORRECT + game.correctCount;
       feedback.textContent = t('correct');
       feedback.className = 'answer-feedback correct';
+      const rect = inputEl.getBoundingClientRect();
+      spawnAnswerConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
     } else {
       feedback.textContent = t('incorrect', {n: game.correctAnswer});
       feedback.className = 'answer-feedback incorrect';
@@ -611,11 +624,34 @@ function endGame() {
   }
 }
 
+function spawnAnswerConfetti(x, y) {
+  const chars = ['🎉', '🎊', '✨', '🎈', '🥳', '💫'];
+  const burst = document.createElement('div');
+  burst.className = 'answer-confetti-burst';
+  burst.style.left = x + 'px';
+  burst.style.top = y + 'px';
+
+  for (let j = 0; j < 8; j++) {
+    const particle = document.createElement('span');
+    particle.className = 'confetti-particle';
+    particle.textContent = chars[Math.floor(Math.random() * chars.length)];
+    particle.style.setProperty('--dx', (Math.random() - 0.5) * 80 + 'px');
+    particle.style.setProperty('--dy', -(30 + Math.random() * 60) + 'px');
+    particle.style.setProperty('--rot', Math.random() * 360 + 'deg');
+    particle.style.animationDuration = (0.5 + Math.random() * 0.3) + 's';
+    burst.appendChild(particle);
+  }
+
+  document.body.appendChild(burst);
+  setTimeout(() => burst.remove(), 1000);
+}
+
 function spawnConfetti() {
   const chars = ['🎉', '🎊', '✨', '🎈', '🥳', '💫'];
   const container = document.getElementById('results-congrats');
 
-  for (let i = 0; i < 3; i++) {
+  const bursts = Math.round(game.rounds / 3);
+  for (let i = 0; i < bursts; i++) {
     setTimeout(() => {
       const burst = document.createElement('div');
       burst.className = 'confetti-burst';
@@ -666,8 +702,20 @@ const TICKER_SYSTEMS = [
 
 function generateTickerText() {
   const pairs = [];
+  let lastKey = null;
+  let lastColor = null;
   for (let i = 0; i < 20; i++) {
-    const sys = TICKER_SYSTEMS[Math.floor(Math.random() * TICKER_SYSTEMS.length)];
+    let sys;
+    do {
+      sys = TICKER_SYSTEMS[Math.floor(Math.random() * TICKER_SYSTEMS.length)];
+    } while (sys.key === lastKey);
+    lastKey = sys.key;
+
+    let color;
+    do {
+      color = TICKER_COLORS[Math.floor(Math.random() * TICKER_COLORS.length)];
+    } while (color === lastColor);
+    lastColor = color;
     const num = sys.min + Math.floor(Math.random() * (sys.max - sys.min + 1));
     const display = SYSTEMS[sys.key].toDisplay(num);
     let labelled = display;
@@ -676,7 +724,6 @@ function generateTickerText() {
     const wrapped = sys.key === 'slavonic'
       ? '<span class="slavonic-font">' + labelled + '</span>'
       : labelled;
-    const color = TICKER_COLORS[Math.floor(Math.random() * TICKER_COLORS.length)];
     pairs.push('<span style="color:' + color + '">' + wrapped + ' = ' + num + '</span>');
   }
   return pairs.join('\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0');
