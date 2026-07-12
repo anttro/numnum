@@ -111,7 +111,7 @@ body {
   display: inline-block;
   white-space: nowrap;
   color: var(--text-dim);
-  font-size: 1.05rem;
+  font-size: 1.3rem;
   font-family: monospace;
   animation: ticker-scroll 40s linear infinite;
 }

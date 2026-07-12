@@ -646,10 +646,10 @@ const TICKER_COLORS = [
 ];
 
 const TICKER_SYSTEMS = [
-  { key: 'binary',    min: 1,   max: 255,  prefix: toSubscript(2) },
-  { key: 'octal',     min: 1,   max: 511,  prefix: toSubscript(8) },
+  { key: 'binary',    min: 1,   max: 255,  suffix: toSubscript(2) },
+  { key: 'octal',     min: 1,   max: 511,  suffix: toSubscript(8) },
   { key: 'hex',       min: 1,   max: 255,  prefix: '0x' },
-  { key: 'ternary',   min: 1,   max: 27,   prefix: toSubscript(3) },
+  { key: 'ternary',   min: 1,   max: 27,   suffix: toSubscript(3) },
   { key: 'braille',   min: 1,   max: 99,   prefix: null },
   { key: 'roman',     min: 1,   max: 3999, prefix: null },
   { key: 'greek',     min: 1,   max: 999,  prefix: null },
@@ -662,10 +662,12 @@ function generateTickerText() {
     const sys = TICKER_SYSTEMS[Math.floor(Math.random() * TICKER_SYSTEMS.length)];
     const num = sys.min + Math.floor(Math.random() * (sys.max - sys.min + 1));
     const display = SYSTEMS[sys.key].toDisplay(num);
-    const prefixed = sys.prefix ? sys.prefix + display : display;
+    let labelled = display;
+    if (sys.prefix) labelled = sys.prefix + display;
+    if (sys.suffix) labelled = display + sys.suffix;
     const wrapped = sys.key === 'slavonic'
-      ? '<span class="slavonic-font">' + prefixed + '</span>'
-      : prefixed;
+      ? '<span class="slavonic-font">' + labelled + '</span>'
+      : labelled;
     const color = TICKER_COLORS[Math.floor(Math.random() * TICKER_COLORS.length)];
     pairs.push('<span style="color:' + color + '">' + wrapped + ' = ' + num + '</span>');
   }
