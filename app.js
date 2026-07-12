@@ -5,7 +5,7 @@ let LANG = localStorage.getItem('numnum-lang') || (navigator.language.startsWith
 const STRINGS = {
   en: {
     subtitle: 'Numeral systems trainer',
-    startGame: 'Start Game',
+    startGame: 'Start',
     chooseSystem: 'Choose numeral system',
     positional: 'Positional',
     nonPositional: 'Non-Positional',
@@ -15,13 +15,13 @@ const STRINGS = {
     answerMode: 'Answer Mode',
     timeLimit: 'Time Limit',
     numberOfRounds: 'Number of Rounds',
-    play: 'Play!',
+    play: 'Go!',
     timeLeft: 'Time left',
     submit: 'Submit',
     next: 'Next',
     results: 'Results',
     mistakes: 'Mistakes',
-    playAgain: 'Play Again',
+    playAgain: 'Start again',
     menu: 'Menu',
     choose: 'Choose',
     type: 'Type',
@@ -42,7 +42,7 @@ const STRINGS = {
   },
   ru: {
     subtitle: '\u0422\u0440\u0435\u043D\u0430\u0436\u0435\u0440 \u0441\u0438\u0441\u0442\u0435\u043C \u0441\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F',
-    startGame: '\u041D\u0430\u0447\u0430\u0442\u044C \u0438\u0433\u0440\u0443',
+    startGame: 'Начать',
     chooseSystem: '\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0438\u0441\u0442\u0435\u043C\u0443 \u0441\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F',
     positional: '\u041F\u043E\u0437\u0438\u0446\u0438\u043E\u043D\u043D\u044B\u0435',
     nonPositional: '\u041D\u0435\u043F\u043E\u0437\u0438\u0446\u0438\u043E\u043D\u043D\u044B\u0435',
@@ -52,13 +52,13 @@ const STRINGS = {
     answerMode: '\u0420\u0435\u0436\u0438\u043C \u043E\u0442\u0432\u0435\u0442\u0430',
     timeLimit: '\u041E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u0438\u0435 \u043F\u043E \u0432\u0440\u0435\u043C\u0435\u043D\u0438',
     numberOfRounds: '\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0440\u0430\u0443\u043D\u0434\u043E\u0432',
-    play: '\u0418\u0433\u0440\u0430\u0442\u044C!',
+    play: '\u0412\u043F\u0435\u0440\u0451\u0434!',
     timeLeft: '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C',
     submit: '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C',
     next: '\u0414\u0430\u043B\u0435\u0435',
     results: '\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B',
     mistakes: '\u041E\u0448\u0438\u0431\u043A\u0438',
-    playAgain: '\u0418\u0433\u0440\u0430\u0442\u044C \u0441\u043D\u043E\u0432\u0430',
+    playAgain: 'Начать заново',
     menu: '\u041C\u0435\u043D\u044E',
     choose: '\u0412\u044B\u0431\u043E\u0440',
     type: '\u0412\u0432\u043E\u0434',
@@ -323,7 +323,10 @@ function renderSetupOptions() {
 }
 
 // ---- GAME ----
+let lastSetupState = null;
+
 function startGame() {
+  lastSetupState = { ...setupState };
   game.system = setupState.system;
   game.range = setupState.rangeData || RANGES[setupState.range];
   game.mode = MODES[setupState.mode]?.value ?? setupState.mode;
@@ -739,7 +742,8 @@ document.getElementById('btn-next').addEventListener('click', () => {
 });
 
 document.getElementById('btn-play-again').addEventListener('click', () => {
-  renderSetupSystem();
+  setupState = { ...lastSetupState };
+  startGame();
 });
 
 document.getElementById('btn-results-menu').addEventListener('click', () => {

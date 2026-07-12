@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=35">
+  <link rel="stylesheet" href="styles.css?v=37">
 </head>
 <body>
   <div id="app">
@@ -38,13 +38,13 @@
         <h2 data-i18n="chooseSystem">Choose numeral system</h2>
 
         <div class="system-group">
-          <h3 data-i18n="positional">Positional</h3>
-          <div id="setup-systems-pos" class="option-grid"></div>
+          <h3 data-i18n="nonPositional">Non-Positional</h3>
+          <div id="setup-systems-nonpos" class="option-grid"></div>
         </div>
 
         <div class="system-group">
-          <h3 data-i18n="nonPositional">Non-Positional</h3>
-          <div id="setup-systems-nonpos" class="option-grid"></div>
+          <h3 data-i18n="positional">Positional</h3>
+          <div id="setup-systems-pos" class="option-grid"></div>
         </div>
 
         <button class="btn btn-secondary" id="btn-system-back" data-i18n="back">Back</button>
@@ -155,10 +155,10 @@
 
   </div>
 
-  <script type="module" src="app.js?v=35"></script>
+  <script type="module" src="app.js?v=37"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=35').catch(() => {});
+      navigator.serviceWorker.register('/sw.js?v=37').catch(() => {});
     }
   </script>
 </body>
