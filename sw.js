@@ -1,4 +1,4 @@
-const CACHE_NAME = 'numnum-v13';
+const CACHE_NAME = 'numnum-v14';
 const ASSETS = [
   '/',
   '/index.html',
@@ -7,6 +7,8 @@ const ASSETS = [
   '/numerals.js',
   '/manifest.json',
   '/icon.svg',
+  '/icon-192.png',
+  '/icon-512.png',
 ];
 
 self.addEventListener('install', (e) => {
