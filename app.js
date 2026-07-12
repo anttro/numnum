@@ -685,10 +685,18 @@ function toSubscript(n) {
   return String(n).split('').map(d => SUBSCRIPTS[d]).join('');
 }
 
-const TICKER_COLORS = [
+const TICKER_COLORS_DARK = [
   '#7ec8e3', '#a8d5a2', '#f0c674', '#d4a0d4', '#e8a87c',
   '#87ceeb', '#98d4bb', '#deb887', '#c9b1ff', '#ff9a9e'
 ];
+
+const TICKER_COLORS_LIGHT = [
+  '#2980b9', '#27ae60', '#d4a017', '#9b59b6', '#d35400',
+  '#3498db', '#1abc9c', '#b8860b', '#8e44ad', '#e74c3c'
+];
+
+const isLightTheme = window.matchMedia('(prefers-color-scheme: light)').matches;
+const TICKER_COLORS = isLightTheme ? TICKER_COLORS_LIGHT : TICKER_COLORS_DARK;
 
 const TICKER_SYSTEMS = [
   { key: 'binary',    min: 1,   max: 255,  suffix: toSubscript(2) },

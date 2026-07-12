@@ -399,6 +399,10 @@ body {
   font-size: 1.5rem;
 }
 
+.result-system.slavonic-font {
+  font-size: 1.6rem;
+}
+
 .answer-feedback {
   min-height: 40px;
   font-size: 1.1rem;
