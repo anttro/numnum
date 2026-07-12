@@ -391,6 +391,10 @@ body {
   font-size: 3.2rem;
 }
 
+.ticker .slavonic-font {
+  font-size: 1.5rem;
+}
+
 .answer-feedback {
   min-height: 40px;
   font-size: 1.1rem;

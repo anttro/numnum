@@ -435,6 +435,7 @@ function handleChoice(idx, val, choices) {
     feedback.textContent = t('incorrect', {n: game.correctAnswer});
     feedback.className = 'answer-feedback incorrect';
     game.mistakes.push({
+      key: game.system,
       system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
       decimal: game.correctAnswer,
       systemName: systemName(game.system),
@@ -489,6 +490,7 @@ function renderNumpad() {
       feedback.textContent = t('incorrect', {n: game.correctAnswer});
       feedback.className = 'answer-feedback incorrect';
       game.mistakes.push({
+        key: game.system,
         system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
         decimal: game.correctAnswer,
         systemName: systemName(game.system),
@@ -554,6 +556,7 @@ function startTimer() {
         feedback.textContent = t('timesUp', {n: game.correctAnswer});
         feedback.className = 'answer-feedback incorrect';
         game.mistakes.push({
+          key: game.system,
           system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
           decimal: game.correctAnswer,
           systemName: systemName(game.system),
@@ -605,8 +608,9 @@ function endGame() {
     game.mistakes.forEach(m => {
       const item = document.createElement('div');
       item.className = 'result-item';
+      const sysClass = m.key === 'slavonic' ? ' slavonic-font' : '';
       item.innerHTML = `
-        <div class="result-system">${m.system}</div>
+        <div class="result-system${sysClass}">${m.system}</div>
         <div class="result-arrow">\u2192</div>
         <div class="result-decimal">${m.decimal}</div>
       `;
