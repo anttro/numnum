@@ -640,6 +640,11 @@ function toSubscript(n) {
   return String(n).split('').map(d => SUBSCRIPTS[d]).join('');
 }
 
+const TICKER_COLORS = [
+  '#7ec8e3', '#a8d5a2', '#f0c674', '#d4a0d4', '#e8a87c',
+  '#87ceeb', '#98d4bb', '#deb887', '#c9b1ff', '#ff9a9e'
+];
+
 const TICKER_SYSTEMS = [
   { key: 'binary',    min: 1,   max: 255,  prefix: toSubscript(2) },
   { key: 'octal',     min: 1,   max: 511,  prefix: toSubscript(8) },
@@ -661,7 +666,8 @@ function generateTickerText() {
     const wrapped = sys.key === 'slavonic'
       ? '<span class="slavonic-font">' + prefixed + '</span>'
       : prefixed;
-    pairs.push(wrapped + ' = ' + num);
+    const color = TICKER_COLORS[Math.floor(Math.random() * TICKER_COLORS.length)];
+    pairs.push('<span style="color:' + color + '">' + wrapped + ' = ' + num + '</span>');
   }
   return pairs.join('\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0');
 }

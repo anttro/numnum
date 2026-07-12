@@ -114,12 +114,11 @@ body {
   font-size: 1.05rem;
   font-family: monospace;
   animation: ticker-scroll 40s linear infinite;
-  padding-left: 100%;
 }
 
 @keyframes ticker-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
 }
 
 /* BUTTONS */
