@@ -335,6 +335,7 @@ function startGame() {
   game.currentRound = 0;
   game.correctCount = 0;
   game.mistakes = [];
+  game.lastAnswer = null;
 
   document.getElementById('score-correct').textContent = '0';
   document.getElementById('score-total').textContent = '0';
@@ -352,7 +353,12 @@ function nextRound() {
 
   game.currentRound++;
   game.answered = false;
-  game.correctAnswer = randInt(game.range.min, game.range.max);
+  let num;
+  do {
+    num = randInt(game.range.min, game.range.max);
+  } while (num === game.lastAnswer && game.range.min !== game.range.max);
+  game.correctAnswer = num;
+  game.lastAnswer = num;
 
   document.getElementById('score-total').textContent = game.currentRound;
   document.getElementById('score-correct').textContent = game.correctCount;
@@ -382,7 +388,8 @@ function renderChoices() {
   choiceArea.classList.remove('hidden');
   numpadArea.classList.add('hidden');
 
-  const choices = generateChoices(game.correctAnswer, [game.range.min, game.range.max], 3);
+  const nonpos = ['roman', 'greek', 'slavonic', 'hebrew'];
+  const choices = generateChoices(game.correctAnswer, [game.range.min, game.range.max], 3, nonpos.includes(game.system));
   choices.forEach((val, i) => {
     const btn = document.getElementById('choice-' + i);
     btn.textContent = val;

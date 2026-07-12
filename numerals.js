@@ -191,17 +191,19 @@ function toHebrew(num) {
   return letters.slice(0, -1).join('') + HEB_GERSHAYIM + letters[letters.length - 1];
 }
 
-export function generateChoices(correctAnswer, allRanges, count = 3) {
+export function generateChoices(correctAnswer, allRanges, count = 3, matchLastDigit = false) {
   const choices = new Set([correctAnswer]);
   const [min, max] = allRanges;
+  const useLastDigit = matchLastDigit && correctAnswer > 10;
   let attempts = 0;
   while (choices.size < count && attempts < 100) {
     let wrong;
-    const offset = Math.floor(Math.random() * 20) + 1;
-    if (Math.random() < 0.5) {
-      wrong = correctAnswer + offset;
+    if (useLastDigit) {
+      const offset = (Math.floor(Math.random() * 20) + 1) * 10;
+      wrong = Math.random() < 0.5 ? correctAnswer + offset : correctAnswer - offset;
     } else {
-      wrong = correctAnswer - offset;
+      const offset = Math.floor(Math.random() * 20) + 1;
+      wrong = Math.random() < 0.5 ? correctAnswer + offset : correctAnswer - offset;
     }
     if (wrong >= min && wrong <= max && wrong !== correctAnswer) {
       choices.add(wrong);
@@ -209,7 +211,14 @@ export function generateChoices(correctAnswer, allRanges, count = 3) {
     attempts++;
   }
   while (choices.size < count) {
-    const r = min + Math.floor(Math.random() * (max - min + 1));
+    let r;
+    if (useLastDigit) {
+      do {
+        r = min + Math.floor(Math.random() * (max - min + 1));
+      } while (r % 10 !== correctAnswer % 10 && choices.size < count + 50);
+    } else {
+      r = min + Math.floor(Math.random() * (max - min + 1));
+    }
     choices.add(r);
   }
   const arr = Array.from(choices);
