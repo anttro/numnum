@@ -591,6 +591,7 @@ body {
 .result-arrow {
   color: var(--text-dim);
   flex-shrink: 0;
+  font-size: 1.4rem;
 }
 
 .result-decimal {
