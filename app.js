@@ -33,6 +33,7 @@ const STRINGS = {
     congratulations: 'Congratulations!',
     pleaseSelect: 'Please select all options',
     installApp: 'Install App',
+    sec: 'sec',
     systemNames: {
       binary: 'Binary', octal: 'Octal', hex: 'Hexadecimal',
       ternary: 'Balanced Ternary', braille: 'Braille Decimal',
@@ -70,6 +71,7 @@ const STRINGS = {
     congratulations: '\u041F\u043E\u0437\u0434\u0440\u0430\u0432\u043B\u044F\u0435\u043C!',
     pleaseSelect: '\u041F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0441\u0435 \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u044B',
     installApp: '\u0423\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435',
+    sec: '\u0441\u0435\u043A',
     systemNames: {
       binary: '\u0414\u0432\u043E\u0438\u0447\u043D\u0430\u044F',
       octal: '\u0412\u043E\u0441\u044C\u043C\u0435\u0440\u0438\u0447\u043D\u0430\u044F',
@@ -171,10 +173,10 @@ const MODES = [
 ];
 
 const TIMINGS = [
-  { label: '60 sec', value: 60 },
-  { label: '40 sec', value: 40 },
-  { label: '10 sec', value: 10 },
-  { label: 'nolimit', value: 0 },
+  { value: 60 },
+  { value: 40 },
+  { value: 10 },
+  { value: 0 },
 ];
 
 const ROUNDS = [10, 25, 50, 100];
@@ -296,7 +298,7 @@ function renderSetupOptions() {
   TIMINGS.forEach((tm, i) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn' + (i === defaultTiming ? ' selected' : '');
-    btn.textContent = tm.value === 0 ? t('noLimit') : tm.label;
+    btn.textContent = tm.value === 0 ? t('noLimit') : tm.value + ' ' + t('sec');
     btn.addEventListener('click', () => {
       timingDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
@@ -324,6 +326,8 @@ function renderSetupOptions() {
 
 // ---- GAME ----
 let lastSetupState = null;
+const MARK_CORRECT = '\u2713 ';
+const MARK_INCORRECT = '\u2717 ';
 
 function startGame() {
   lastSetupState = { ...setupState };
@@ -337,9 +341,10 @@ function startGame() {
   game.mistakes = [];
   game.lastAnswer = null;
 
-  document.getElementById('score-correct').textContent = '0';
-  document.getElementById('score-total').textContent = '0';
-  document.getElementById('score-system').textContent = systemName(game.system);
+  document.getElementById('score-system-range').textContent = systemName(game.system) + ': ' + game.range.label;
+  document.getElementById('score-round').textContent = '0/' + game.rounds;
+  document.getElementById('score-correct').textContent = MARK_CORRECT + '0';
+  document.getElementById('score-incorrect').textContent = MARK_INCORRECT + '0';
 
   showScreen('game');
   nextRound();
@@ -360,8 +365,8 @@ function nextRound() {
   game.correctAnswer = num;
   game.lastAnswer = num;
 
-  document.getElementById('score-total').textContent = game.currentRound;
-  document.getElementById('score-correct').textContent = game.correctCount;
+  document.getElementById('score-round').textContent = game.currentRound + '/' + game.rounds;
+  document.getElementById('score-correct').textContent = MARK_CORRECT + game.correctCount;
 
   const display = SYSTEMS[game.system].toDisplay(game.correctAnswer);
   const numEl = document.getElementById('number-display');
@@ -411,7 +416,7 @@ function handleChoice(idx, val, choices) {
 
   if (val === game.correctAnswer) {
     game.correctCount++;
-    document.getElementById('score-correct').textContent = game.correctCount;
+      document.getElementById('score-correct').textContent = MARK_CORRECT + game.correctCount;
     allBtns[idx].classList.add('correct-choice');
     feedback.textContent = t('correct');
     feedback.className = 'answer-feedback correct';
@@ -427,6 +432,7 @@ function handleChoice(idx, val, choices) {
       systemName: systemName(game.system),
     });
   }
+  document.getElementById('score-incorrect').textContent = MARK_INCORRECT + (game.currentRound - game.correctCount);
 
   document.getElementById('btn-next').classList.remove('hidden');
 }
@@ -466,7 +472,7 @@ function renderNumpad() {
     const feedback = document.getElementById('answer-feedback');
     if (val === game.correctAnswer) {
       game.correctCount++;
-      document.getElementById('score-correct').textContent = game.correctCount;
+    document.getElementById('score-correct').textContent = MARK_CORRECT + game.correctCount;
       feedback.textContent = t('correct');
       feedback.className = 'answer-feedback correct';
     } else {
@@ -478,6 +484,7 @@ function renderNumpad() {
         systemName: systemName(game.system),
       });
     }
+    document.getElementById('score-incorrect').textContent = MARK_INCORRECT + (game.currentRound - game.correctCount);
 
     document.getElementById('btn-next').classList.remove('hidden');
   };
@@ -518,12 +525,12 @@ function startTimer() {
 
   timerArea.classList.add('visible');
   game.timeLeft = game.timing;
-  timerEl.textContent = game.timeLeft + 's';
+  timerEl.textContent = game.timeLeft + ' ' + t('sec');
   timerEl.classList.remove('urgent');
 
   game.timerInterval = setInterval(() => {
     game.timeLeft--;
-    timerEl.textContent = game.timeLeft + 's';
+  timerEl.textContent = game.timeLeft + ' ' + t('sec');
 
     if (game.timeLeft <= 10) {
       timerEl.classList.add('urgent');
@@ -541,6 +548,7 @@ function startTimer() {
           decimal: game.correctAnswer,
           systemName: systemName(game.system),
         });
+  document.getElementById('score-incorrect').textContent = MARK_INCORRECT + (game.currentRound - game.correctCount);
 
         document.getElementById('btn-next').classList.remove('hidden');
 

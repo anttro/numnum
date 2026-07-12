@@ -252,14 +252,24 @@ body {
 }
 
 .score-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 1.2rem;
   font-weight: 700;
 }
 
-#score-system {
-  margin-left: 8px;
+.score-correct { 
+  color: var(--correct);
+  margin-left: 16px;
+}
+.score-incorrect { color: var(--incorrect); }
+
+.system-range-label {
+  text-align: center;
+  font-size: 1rem;
   color: var(--text-dim);
-  font-size: 0.9rem;
+  padding: 8px 20px 0;
 }
 
 .timer-area {
@@ -522,6 +532,9 @@ body {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--correct);
+}
+
+.results-congrats:not(:empty) {
   margin-bottom: 16px;
   min-height: 48px;
 }

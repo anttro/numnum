@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=41">
+  <link rel="stylesheet" href="styles.css?v=46">
 </head>
 <body>
   <div id="app">
@@ -93,8 +93,9 @@
     <div id="screen-game" class="screen">
       <div class="game-header">
         <div class="score-display">
-          <span id="score-correct">0</span>/<span id="score-total">0</span>
-          <span id="score-system"></span>
+          <span id="score-round">0/0</span>
+          <span id="score-correct" class="score-correct">0</span>
+          <span id="score-incorrect" class="score-incorrect">0</span>
         </div>
         <div class="timer-area" id="timer-area">
           <span class="timer-label" data-i18n="timeLeft">Time left</span>
@@ -104,6 +105,8 @@
           <button class="btn-stop" id="btn-stop">&times;</button>
         </div>
       </div>
+
+      <div class="system-range-label" id="score-system-range"></div>
 
       <div class="game-body">
         <div class="number-display" id="number-display"></div>
@@ -155,10 +158,10 @@
 
   </div>
 
-  <script type="module" src="app.js?v=41"></script>
+  <script type="module" src="app.js?v=46"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=41').catch(() => {});
+      navigator.serviceWorker.register('/sw.js?v=46').catch(() => {});
     }
   </script>
 </body>
