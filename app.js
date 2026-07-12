@@ -120,7 +120,7 @@ const SYSTEM_RANGES = {
     { label: '\u20133\u00B3 \u2013 3\u00B3', min: -27, max: 27 },
   ],
   octal: [
-    { label: '8\u2070 \u2013 8\u00B9', min: 1, max: 8 },
+    { label: '8\u00B9 \u2013 8\u00B2', min: 8, max: 64 },
     { label: '8\u00B2 \u2013 8\u00B3', min: 64, max: 512 },
     { label: '8\u2070 \u2013 8\u00B3', min: 1, max: 512 },
     { label: '8\u2070 \u2013 8\u2074', min: 1, max: 4096 },
