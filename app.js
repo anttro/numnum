@@ -37,7 +37,7 @@ const STRINGS = {
     chooseAnswer: 'Choose answer',
     enterEquivalent: 'Enter equivalent',
     systemNames: {
-      binary: 'Binary', octal: 'Octal', hex: 'Hexadecimal',
+      binary: 'Binary', base3: 'Ternary', octal: 'Octal', hex: 'Hexadecimal',
       ternary: 'Balanced Ternary', braille: 'Braille Decimal',
       roman: 'Roman', slavonic: 'Church Slavonic',
       greek: 'Greek', hebrew: 'Hebrew',
@@ -78,9 +78,10 @@ const STRINGS = {
     enterEquivalent: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0447\u0438\u0441\u043B\u043E',
     systemNames: {
       binary: '\u0414\u0432\u043E\u0438\u0447\u043D\u0430\u044F',
+      base3: '\u0422\u0440\u043E\u0438\u0447\u043D\u0430\u044F',
       octal: '\u0412\u043E\u0441\u044C\u043C\u0435\u0440\u0438\u0447\u043D\u0430\u044F',
       hex: '\u0428\u0435\u0441\u0442\u043D\u0430\u0434\u0446\u0430\u0442\u0435\u0440\u0438\u0447\u043D\u0430\u044F',
-      ternary: '\u0423\u0440\u0430\u0432\u043D\u043E\u0432\u0435\u0448\u0435\u043D\u043D\u0430\u044F \u0442\u0440\u043E\u0438\u0447\u043D\u0430\u044F',
+      ternary: '\u0421\u0438\u043C\u043C\u0435\u0442\u0440\u0438\u0447\u043D\u0430\u044F \u0442\u0440\u043E\u0438\u0447\u043D\u0430\u044F',
       braille: '\u0414\u0435\u0441\u044F\u0442\u0438\u0447\u043D\u0430\u044F \u0411\u0440\u0430\u0439\u043B\u044F',
       roman: '\u0420\u0438\u043C\u0441\u043A\u0430\u044F',
       slavonic: '\u0426\u0435\u0440\u043A\u043E\u0432\u043D\u043E\u0441\u043B\u0430\u0432\u044F\u043D\u0441\u043A\u0430\u044F',
@@ -116,6 +117,12 @@ const SYSTEM_RANGES = {
     { label: '2\u00B3 \u2013 2\u2077', min: 8, max: 128 },
     { label: '2\u2070 \u2013 2\u2077', min: 1, max: 128 },
     { label: '2\u2070 \u2013 2\u00B9\u2075', min: 1, max: 32768 },
+  ],
+  base3: [
+    { label: '3\u2070 \u2013 3\u00B9', min: 1, max: 3 },
+    { label: '3\u00B9 \u2013 3\u00B2', min: 3, max: 9 },
+    { label: '3\u00B2 \u2013 3\u00B3', min: 9, max: 27 },
+    { label: '3\u2070 \u2013 3\u00B3', min: 1, max: 27 },
   ],
   ternary: [
     { label: '3\u2070 \u2013 3\u00B9', min: 1, max: 3 },
@@ -168,12 +175,13 @@ const SYSTEM_RANGES = {
     { label: '10 \u2013 19', min: 10, max: 19 },
     { label: '20 \u2013 99', min: 20, max: 99 },
     { label: '1 \u2013 99', min: 1, max: 99 },
-    { label: '100 \u2013 499', min: 100, max: 499 },
+    { label: '100 \u2013 999', min: 100, max: 999 },
+    { label: '1000 \u2013 9999', min: 1000, max: 9999 },
   ],
 };
 
 const SYSTEM_GROUPS = {
-  pos: ['binary', 'octal', 'hex', 'ternary', 'braille'],
+  pos: ['binary', 'octal', 'hex', 'braille', 'base3', 'ternary'],
   nonpos: ['roman', 'greek', 'slavonic', 'hebrew'],
 };
 
@@ -706,6 +714,7 @@ const TICKER_COLORS = isLightTheme ? TICKER_COLORS_LIGHT : TICKER_COLORS_DARK;
 
 const TICKER_SYSTEMS = [
   { key: 'binary',    min: 1,   max: 255,  suffix: toSubscript(2) },
+  { key: 'base3',     min: 1,   max: 81,   suffix: toSubscript(3) },
   { key: 'octal',     min: 1,   max: 511,  suffix: toSubscript(8) },
   { key: 'hex',       min: 1,   max: 255,  prefix: '0x' },
   { key: 'ternary',   min: 1,   max: 27,   suffix: toSubscript(3) },

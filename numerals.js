@@ -14,6 +14,11 @@ export const SYSTEMS = {
     short: 'HEX',
     toDisplay: (n) => n.toString(16).toUpperCase(),
   },
+  base3: {
+    name: 'Ternary',
+    short: 'TER',
+    toDisplay: toBase3,
+  },
   ternary: {
     name: 'Balanced Ternary',
     short: 'BT3',
@@ -58,6 +63,17 @@ function toRoman(num) {
     }
   }
   return result;
+}
+
+function toBase3(num) {
+  if (num === 0) return '0';
+  let n = Math.abs(num);
+  let result = '';
+  while (n > 0) {
+    result = (n % 3) + result;
+    n = Math.floor(n / 3);
+  }
+  return num < 0 ? '-' + result : result;
 }
 
 function toBalTernary(num) {
@@ -170,25 +186,53 @@ const HEB_HUNDREDS = ['\u05E7','\u05E8','\u05E9','\u05EA'];
 const HEB_GERESH = '\u05F3';
 const HEB_GERSHAYIM = '\u05F4';
 
-function toHebrew(num) {
-  if (num <= 0 || num > 499) return String(num);
-
-  if (num === 15) return '\u05D8' + HEB_GERSHAYIM + '\u05D5';
-  if (num === 16) return '\u05D8' + HEB_GERSHAYIM + '\u05D6';
-
+function toHebrewLetters(num) {
   const letters = [];
   const h = Math.floor(num / 100);
   num %= 100;
   const t = Math.floor(num / 10);
   const u = num % 10;
 
-  if (h > 0) letters.push(HEB_HUNDREDS[h - 1]);
-  if (t > 0) letters.push(HEB_TENS[t - 1]);
-  if (u > 0) letters.push(HEB_UNITS[u - 1]);
+  if (h === 4) {
+    letters.push(HEB_HUNDREDS[3]);
+    if (t > 0) letters.push(HEB_TENS[t - 1]);
+    if (u > 0) letters.push(HEB_UNITS[u - 1]);
+  } else if (h >= 5) {
+    letters.push(HEB_HUNDREDS[3]);
+    const extra = h - 4;
+    if (extra > 0) letters.push(HEB_HUNDREDS[extra - 1]);
+    if (t > 0) letters.push(HEB_TENS[t - 1]);
+    if (u > 0) letters.push(HEB_UNITS[u - 1]);
+  } else {
+    if (h > 0) letters.push(HEB_HUNDREDS[h - 1]);
+    if (t > 0) letters.push(HEB_TENS[t - 1]);
+    if (u > 0) letters.push(HEB_UNITS[u - 1]);
+  }
+  return letters;
+}
 
-  if (letters.length === 0) return '0';
-  if (letters.length === 1) return letters[0] + HEB_GERESH;
-  return letters.slice(0, -1).join('') + HEB_GERSHAYIM + letters[letters.length - 1];
+function toHebrew(num) {
+  if (num <= 0 || num > 9999) return String(num);
+
+  if (num === 15) return '\u05D8' + HEB_GERSHAYIM + '\u05D5';
+  if (num === 16) return '\u05D8' + HEB_GERSHAYIM + '\u05D6';
+
+  const thousands = Math.floor(num / 1000);
+  const rest = num % 1000;
+
+  if (thousands > 0 && rest === 0) {
+    return HEB_UNITS[thousands - 1] + HEB_GERESH;
+  }
+
+  let result = '';
+  if (thousands > 0) {
+    result = HEB_UNITS[thousands - 1] + HEB_GERESH;
+  }
+
+  const letters = toHebrewLetters(rest);
+  if (letters.length === 0) return result;
+  if (letters.length === 1) return result + letters[0] + HEB_GERESH;
+  return result + letters.slice(0, -1).join('') + HEB_GERSHAYIM + letters[letters.length - 1];
 }
 
 export function generateChoices(correctAnswer, allRanges, count = 3, matchLastDigit = false) {
