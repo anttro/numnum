@@ -14,7 +14,7 @@ const STRINGS = {
     difficulty: 'Difficulty level',
     answerMode: 'Answer Mode',
     timeLimit: 'Time Limit',
-    numberOfRounds: 'Number of Rounds',
+    numberOfRounds: 'Number of Questions',
     play: 'Go!',
     timeLeft: 'Time left',
     submit: 'Submit',
@@ -53,8 +53,8 @@ const STRINGS = {
     numberRange: '\u0414\u0438\u0430\u043F\u0430\u0437\u043E\u043D \u0447\u0438\u0441\u0435\u043B',
     difficulty: '\u0423\u0440\u043E\u0432\u0435\u043D\u044C \u0441\u043B\u043E\u0436\u043D\u043E\u0441\u0442\u0438',
     answerMode: '\u0420\u0435\u0436\u0438\u043C \u043E\u0442\u0432\u0435\u0442\u0430',
-    timeLimit: '\u041E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u0438\u0435 \u043F\u043E \u0432\u0440\u0435\u043C\u0435\u043D\u0438',
-    numberOfRounds: '\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0440\u0430\u0443\u043D\u0434\u043E\u0432',
+    timeLimit: '\u0412\u0440\u0435\u043C\u044F \u043D\u0430 \u043E\u0442\u0432\u0435\u0442',
+    numberOfRounds: '\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432',
     play: '\u0412\u043F\u0435\u0440\u0451\u0434!',
     timeLeft: '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C',
     submit: '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C',
@@ -193,11 +193,14 @@ const MODES = [
 const TIMINGS = [
   { value: 0 },
   { value: 30 },
-  { value: 15 },
+  { value: 10 },
   { value: 5 },
+  { value: 3 },
+  { value: 2 },
+  { value: 1 },
 ];
 
-const ROUNDS = [10, 25, 50, 100];
+const ROUNDS = [5, 10, 25, 50, 100];
 
 let game = {
   system: null,
@@ -291,7 +294,7 @@ function renderSetupRange() {
 function renderSetupOptions() {
   const defaultMode = 0;
   const defaultTiming = 0;
-  const defaultRounds = 0;
+  const defaultRounds = 1;
 
   setupState.mode = defaultMode;
   setupState.timing = defaultTiming;
@@ -311,32 +314,23 @@ function renderSetupOptions() {
     modesDiv.appendChild(btn);
   });
 
-  const timingDiv = document.getElementById('setup-timing');
-  timingDiv.innerHTML = '';
+  const timingSelect = document.getElementById('setup-timing');
+  timingSelect.innerHTML = '';
   TIMINGS.forEach((tm, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'option-btn' + (i === defaultTiming ? ' selected' : '');
-    btn.textContent = tm.value === 0 ? t('noLimit') : tm.value + ' ' + t('sec');
-    btn.addEventListener('click', () => {
-      timingDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      setupState.timing = i;
-    });
-    timingDiv.appendChild(btn);
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = tm.value === 0 ? t('noLimit') : tm.value + ' ' + t('sec');
+    timingSelect.appendChild(opt);
+  });
+  timingSelect.value = defaultTiming;
+  timingSelect.addEventListener('change', () => {
+    setupState.timing = parseInt(timingSelect.value, 10);
   });
 
-  const roundsDiv = document.getElementById('setup-rounds');
-  roundsDiv.innerHTML = '';
-  ROUNDS.forEach((r, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'option-btn' + (i === defaultRounds ? ' selected' : '');
-    btn.textContent = String(r);
-    btn.addEventListener('click', () => {
-      roundsDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      setupState.rounds = i;
-    });
-    roundsDiv.appendChild(btn);
+  const roundsSelect = document.getElementById('setup-rounds');
+  roundsSelect.value = defaultRounds;
+  roundsSelect.addEventListener('change', () => {
+    setupState.rounds = parseInt(roundsSelect.value, 10);
   });
 
   showScreen('setup-options');
@@ -478,7 +472,8 @@ function renderNumpad() {
     clearBtn.dataset.key = 'clear';
   }
 
-  document.getElementById('btn-submit-answer').classList.remove('hidden');
+  const submitBtn = document.getElementById('btn-submit-answer');
+  submitBtn.classList.add('hidden');
 
   numpadArea.querySelectorAll('.numpad-key').forEach(key => {
     key.onclick = () => handleNumpadKey(key.dataset.key);
@@ -535,6 +530,9 @@ function handleNumpadKey(key) {
       inputEl.textContent += key;
     }
   }
+
+  const submitBtn = document.getElementById('btn-submit-answer');
+  submitBtn.classList.toggle('hidden', isNaN(parseInt(inputEl.textContent, 10)));
 }
 
 function startTimer() {
@@ -625,7 +623,7 @@ function endGame() {
       const sysClass = m.key === 'slavonic' ? ' slavonic-font' : '';
       item.innerHTML = `
         <div class="result-system${sysClass}">${m.system}</div>
-        <div class="result-arrow">\u2192</div>
+        <div class="result-arrow">\u2B95</div>
         <div class="result-decimal">${m.decimal}</div>
       `;
       listEl.appendChild(item);

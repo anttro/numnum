@@ -123,6 +123,8 @@ body {
   cursor: pointer;
   width: 100%;
   max-width: 320px;
+  margin: 0 auto;
+  display: block;
 }
 
 .ticker {
@@ -479,7 +481,7 @@ body {
   padding: 16px;
   background: var(--bg-card);
   border-radius: 8px;
-  min-height: 60px;
+  height: 60px;
   margin-bottom: 16px;
   display: flex;
   align-items: center;

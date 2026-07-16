@@ -76,12 +76,18 @@
 
         <div class="setup-section">
           <h3 data-i18n="timeLimit">Time Limit</h3>
-          <div id="setup-timing" class="option-grid"></div>
+          <select id="setup-timing" class="lang-select"></select>
         </div>
 
         <div class="setup-section">
           <h3 data-i18n="numberOfRounds">Number of Rounds</h3>
-          <div id="setup-rounds" class="option-grid"></div>
+          <select id="setup-rounds" class="lang-select">
+            <option value="0">5</option>
+            <option value="1">10</option>
+            <option value="2">25</option>
+            <option value="3">50</option>
+            <option value="4">100</option>
+          </select>
         </div>
 
         <button class="btn btn-primary btn-large" id="btn-play" data-i18n="play">Play!</button>
