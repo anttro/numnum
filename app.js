@@ -16,7 +16,7 @@ const STRINGS = {
     timeLimit: 'Time Limit',
     numberOfRounds: 'Number of Questions',
     play: 'Go!',
-    timeLeft: 'Time left',
+    timeLeft: '\u23F1',
     submit: 'Submit',
     next: 'Next',
     results: 'Results',
@@ -56,7 +56,7 @@ const STRINGS = {
     timeLimit: '\u0412\u0440\u0435\u043C\u044F \u043D\u0430 \u043E\u0442\u0432\u0435\u0442',
     numberOfRounds: '\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432',
     play: '\u0412\u043F\u0435\u0440\u0451\u0434!',
-    timeLeft: '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C',
+    timeLeft: '\u23F1',
     submit: '\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C',
     next: '\u0414\u0430\u043B\u0435\u0435',
     results: '\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B',
@@ -442,12 +442,15 @@ function handleChoice(idx, val, choices) {
     allBtns[correctIdx].classList.add('correct-choice');
     feedback.textContent = t('incorrect', {n: game.correctAnswer});
     feedback.className = 'answer-feedback incorrect';
-    game.mistakes.push({
-      key: game.system,
-      system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
-      decimal: game.correctAnswer,
-      systemName: systemName(game.system),
-    });
+    if (!game.mistakes.some(m => m.decimal === game.correctAnswer)) {
+      game.mistakes.push({
+        key: game.system,
+        system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
+        decimal: game.correctAnswer,
+        systemName: systemName(game.system),
+        wrong: val,
+      });
+    }
   }
   document.getElementById('score-incorrect').textContent = MARK_INCORRECT + (game.currentRound - game.correctCount);
 
@@ -498,12 +501,15 @@ function renderNumpad() {
     } else {
       feedback.textContent = t('incorrect', {n: game.correctAnswer});
       feedback.className = 'answer-feedback incorrect';
-      game.mistakes.push({
-        key: game.system,
-        system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
-        decimal: game.correctAnswer,
-        systemName: systemName(game.system),
-      });
+      if (!game.mistakes.some(m => m.decimal === game.correctAnswer)) {
+        game.mistakes.push({
+          key: game.system,
+          system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
+          decimal: game.correctAnswer,
+          systemName: systemName(game.system),
+          wrong: val,
+        });
+      }
     }
     document.getElementById('score-incorrect').textContent = MARK_INCORRECT + (game.currentRound - game.correctCount);
 
@@ -567,12 +573,14 @@ function startTimer() {
         const feedback = document.getElementById('answer-feedback');
         feedback.textContent = t('timesUp', {n: game.correctAnswer});
         feedback.className = 'answer-feedback incorrect';
-        game.mistakes.push({
-          key: game.system,
-          system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
-          decimal: game.correctAnswer,
-          systemName: systemName(game.system),
-        });
+        if (!game.mistakes.some(m => m.decimal === game.correctAnswer)) {
+          game.mistakes.push({
+            key: game.system,
+            system: SYSTEMS[game.system].toDisplay(game.correctAnswer),
+            decimal: game.correctAnswer,
+            systemName: systemName(game.system),
+          });
+        }
   document.getElementById('score-incorrect').textContent = MARK_INCORRECT + (game.currentRound - game.correctCount);
 
         document.getElementById('btn-next').classList.remove('hidden');
@@ -625,6 +633,10 @@ function endGame() {
         <div class="result-system${sysClass}">${m.system}</div>
         <div class="result-arrow">\u2B95</div>
         <div class="result-decimal">${m.decimal}</div>
+        ${m.wrong
+          ? '<div class="result-wrong">\u2718 ' + m.wrong + '</div>'
+          : '<div class="result-wrong">\u2718 \u23F1</div>'
+        }
       `;
       listEl.appendChild(item);
     });

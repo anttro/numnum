@@ -619,6 +619,13 @@ body {
   color: var(--correct);
 }
 
+.result-wrong {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--incorrect);
+  margin-left: auto;
+}
+
 .no-mistakes {
   text-align: center;
   color: var(--correct);
