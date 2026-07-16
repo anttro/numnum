@@ -719,7 +719,15 @@ const TICKER_COLORS_LIGHT = [
   '#3498db', '#1abc9c', '#b8860b', '#8e44ad', '#e74c3c'
 ];
 
-const isLightTheme = window.matchMedia('(prefers-color-scheme: light)').matches;
+const THEME_KEY = 'numnum-theme';
+
+function getPreferredTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === 'light' || saved === 'dark') return saved;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+const isLightTheme = getPreferredTheme() === 'light';
 const TICKER_COLORS = isLightTheme ? TICKER_COLORS_LIGHT : TICKER_COLORS_DARK;
 
 const TICKER_SYSTEMS = [
@@ -775,6 +783,19 @@ langSelect.addEventListener('change', () => {
 });
 
 applyTranslations();
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  document.getElementById('theme-toggle').textContent = theme === 'dark' ? '\u2600' : '\u263E';
+}
+
+applyTheme(getPreferredTheme());
+
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+});
 
 let deferredPrompt = null;
 
