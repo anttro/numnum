@@ -766,7 +766,7 @@ function generateTickerText() {
     const wrapped = sys.key === 'slavonic'
       ? '<span class="slavonic-font">' + labelled + '</span>'
       : labelled;
-    pairs.push('<span style="color:' + color + '">' + wrapped + ' = ' + num + '</span>');
+    pairs.push('<span style="color:' + color + '">' + wrapped + ' \u2B95 ' + num + '</span>');
   }
   return pairs.join('\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0');
 }
