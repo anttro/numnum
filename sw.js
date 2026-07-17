@@ -1,4 +1,4 @@
-const CACHE_NAME = 'numnum-v20';
+const CACHE_NAME = 'numnum-v26';
 const ASSETS = [
   '/',
   '/index.html',
@@ -28,6 +28,7 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  if (e.request.url.includes('/theory/')) return;
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request))
   );

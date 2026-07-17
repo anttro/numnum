@@ -6,6 +6,7 @@ const STRINGS = {
   en: {
     subtitle: 'Numeral systems trainer',
     startGame: 'Start',
+    theory: 'Theory',
     chooseSystem: 'Choose numeral system',
     positional: 'Positional',
     nonPositional: 'Non-Positional',
@@ -46,6 +47,7 @@ const STRINGS = {
   ru: {
     subtitle: '\u0422\u0440\u0435\u043D\u0430\u0436\u0435\u0440 \u0441\u0438\u0441\u0442\u0435\u043C \u0441\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F',
     startGame: 'Начать',
+    theory: '\u0422\u0435\u043E\u0440\u0438\u044F',
     chooseSystem: '\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0438\u0441\u0442\u0435\u043C\u0443 \u0441\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F',
     positional: '\u041F\u043E\u0437\u0438\u0446\u0438\u043E\u043D\u043D\u044B\u0435',
     nonPositional: '\u041D\u0435\u043F\u043E\u0437\u0438\u0446\u0438\u043E\u043D\u043D\u044B\u0435',
@@ -184,6 +186,8 @@ const SYSTEM_GROUPS = {
   pos: ['binary', 'octal', 'hex', 'braille', 'base3', 'ternary'],
   nonpos: ['roman', 'greek', 'slavonic', 'hebrew'],
 };
+
+const theoryCache = {};
 
 const MODES = [
   { labelKey: 'choose', value: 'choice' },
@@ -700,6 +704,59 @@ function spawnConfetti() {
   }
 }
 
+// ---- THEORY ----
+
+async function loadTheory(key) {
+  if (theoryCache[key]) return theoryCache[key];
+  try {
+    const resp = await fetch(`theory/${key}.${LANG}.html`);
+    if (!resp.ok) throw new Error(resp.status);
+    const html = await resp.text();
+    theoryCache[key] = html;
+    return html;
+  } catch {
+    if (LANG !== 'en') {
+      try {
+        const resp = await fetch(`theory/${key}.en.html`);
+        const html = await resp.text();
+        theoryCache[key] = html;
+        return html;
+      } catch { return null; }
+    }
+    return null;
+  }
+}
+
+function renderTheorySystem() {
+  const posDiv = document.getElementById('theory-systems-pos');
+  const nonposDiv = document.getElementById('theory-systems-nonpos');
+  posDiv.innerHTML = '';
+  nonposDiv.innerHTML = '';
+
+  for (const [group, keys] of Object.entries(SYSTEM_GROUPS)) {
+    const target = group === 'pos' ? posDiv : nonposDiv;
+    keys.forEach(key => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = systemName(key);
+      btn.addEventListener('click', () => showTheoryContent(key));
+      target.appendChild(btn);
+    });
+  }
+
+  showScreen('theory-system');
+}
+
+async function showTheoryContent(key) {
+  const html = await loadTheory(key);
+  if (!html) return;
+
+  document.getElementById('theory-title').textContent = systemName(key);
+  document.getElementById('theory-scroll').innerHTML = html;
+
+  showScreen('theory-content');
+}
+
 // ---- INIT ----
 
 const SUBSCRIPTS = { '0':'\u2080', '1':'\u2081', '2':'\u2082', '3':'\u2083',
@@ -873,6 +930,18 @@ document.getElementById('btn-play-again').addEventListener('click', () => {
 
 document.getElementById('btn-results-menu').addEventListener('click', () => {
   showScreen('menu');
+});
+
+document.getElementById('btn-theory').addEventListener('click', () => {
+  renderTheorySystem();
+});
+
+document.getElementById('btn-theory-back').addEventListener('click', () => {
+  showScreen('menu');
+});
+
+document.getElementById('btn-theory-content-back').addEventListener('click', () => {
+  renderTheorySystem();
 });
 
 document.getElementById('btn-stop').addEventListener('click', () => {
