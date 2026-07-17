@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=20">
+  <link rel="stylesheet" href="styles.css?v=26">
 </head>
 <body>
   <div id="app">
@@ -24,6 +24,7 @@
           <div class="ticker" id="ticker"></div>
         </div>
         <button class="btn btn-primary btn-large" id="btn-start" data-i18n="startGame">Start Game</button>
+        <button class="btn btn-secondary btn-large" id="btn-theory" data-i18n="theory">Theory</button>
         <div class="menu-controls">
           <select id="lang-select" class="lang-select">
             <option value="en">English</option>
@@ -165,12 +166,37 @@
       </div>
     </div>
 
+    <!-- THEORY: SYSTEM SELECTION -->
+    <div id="screen-theory-system" class="screen">
+      <div class="setup-container">
+        <h2 data-i18n="chooseSystem">Choose numeral system</h2>
+        <div class="system-group">
+          <h3 data-i18n="nonPositional">Non-Positional</h3>
+          <div id="theory-systems-nonpos" class="option-grid"></div>
+        </div>
+        <div class="system-group">
+          <h3 data-i18n="positional">Positional</h3>
+          <div id="theory-systems-pos" class="option-grid"></div>
+        </div>
+        <button class="btn btn-secondary" id="btn-theory-back" data-i18n="back">Back</button>
+      </div>
+    </div>
+
+    <!-- THEORY: CONTENT -->
+    <div id="screen-theory-content" class="screen">
+      <div class="theory-container">
+        <h2 id="theory-title"></h2>
+        <div class="theory-scroll" id="theory-scroll"></div>
+        <button class="btn btn-secondary" id="btn-theory-content-back" data-i18n="back">Back</button>
+      </div>
+    </div>
+
   </div>
 
-  <script type="module" src="app.js?v=20"></script>
+  <script type="module" src="app.js?v=26"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?v=20').catch(() => {});
+      navigator.serviceWorker.register('/sw.js?v=26').catch(() => {});
     }
   </script>
 </body>

@@ -748,3 +748,69 @@ body {
     opacity: 0;
   }
 }
+
+/* THEORY */
+.theory-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 24px;
+  padding-top: calc(24px + var(--safe-top));
+  padding-bottom: calc(24px + var(--safe-bottom));
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.theory-container h2 {
+  flex-shrink: 0;
+  margin-bottom: 16px;
+}
+
+.theory-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.theory-scroll h3 {
+  color: var(--accent);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 24px 0 8px;
+}
+
+.theory-scroll h3:first-child {
+  margin-top: 0;
+}
+
+.theory-scroll p {
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.theory-scroll .theory-example {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: monospace;
+  font-size: 1.1rem;
+  margin: 12px 0;
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+.theory-scroll .slavonic-font {
+  font-family: 'Ponomar', serif;
+  font-size: 1.4rem;
+}
+
+#btn-theory-content-back {
+  flex-shrink: 0;
+  margin-top: 16px;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
