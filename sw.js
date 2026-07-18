@@ -1,4 +1,4 @@
-const CACHE_NAME = 'numnum-v26';
+const CACHE_NAME = 'numnum-v27';
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,6 +9,26 @@ const ASSETS = [
   '/icon.svg',
   '/icon-192.png',
   '/icon-512.png',
+  '/theory/base3.en.html',
+  '/theory/base3.ru.html',
+  '/theory/binary.en.html',
+  '/theory/binary.ru.html',
+  '/theory/braille.en.html',
+  '/theory/braille.ru.html',
+  '/theory/greek.en.html',
+  '/theory/greek.ru.html',
+  '/theory/hebrew.en.html',
+  '/theory/hebrew.ru.html',
+  '/theory/hex.en.html',
+  '/theory/hex.ru.html',
+  '/theory/octal.en.html',
+  '/theory/octal.ru.html',
+  '/theory/roman.en.html',
+  '/theory/roman.ru.html',
+  '/theory/slavonic.en.html',
+  '/theory/slavonic.ru.html',
+  '/theory/ternary.en.html',
+  '/theory/ternary.ru.html',
 ];
 
 self.addEventListener('install', (e) => {
@@ -28,7 +48,6 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.url.includes('/theory/')) return;
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request))
   );
