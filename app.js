@@ -221,9 +221,15 @@ let game = {
   mistakes: [],
 };
 
+let popstateHandled = false;
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
+  if (id !== 'menu' && !popstateHandled) {
+    history.pushState({ screen: id }, '');
+  }
+  popstateHandled = false;
 }
 
 function shuffle(arr) {
@@ -976,5 +982,27 @@ document.addEventListener('keydown', (e) => {
       const btn = document.getElementById('choice-' + idx);
       if (btn && !btn.disabled) btn.click();
     }
+  }
+});
+
+// Handle mobile back/cancel button
+const BACK_MAP = {
+  'screen-setup-system': 'btn-system-back',
+  'screen-setup-range': 'btn-range-back',
+  'screen-setup-options': 'btn-options-back',
+  'screen-game': 'btn-stop',
+  'screen-results': 'btn-results-menu',
+  'screen-theory-system': 'btn-theory-back',
+  'screen-theory-content': 'btn-theory-content-back',
+};
+
+window.addEventListener('popstate', () => {
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+
+  const btnId = BACK_MAP[active.id];
+  if (btnId) {
+    popstateHandled = true;
+    document.getElementById(btnId).click();
   }
 });
