@@ -1,6 +1,6 @@
-# numnum
+# NumNum
 
-тренер систем счисления
+Numeral systems trainer PWA
 
 **Demo:** [numnum.atroshin.ru](https://numnum.atroshin.ru)
 
