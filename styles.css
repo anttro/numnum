@@ -73,13 +73,31 @@ html[data-theme="light"] {
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Noto Sans Symbols 2';
+  src: url('NotoSansSymbols2-subset.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+232B, U+23F1, U+2600, U+2713, U+2717, U+2801, U+2803, U+2809-280B, U+2811, U+2813, U+2819-281B, U+283C, U+2B95;
+}
+
+@font-face {
+  font-family: 'Noto Sans Symbols 2';
+  src: url('NotoSansMath-subset.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+2295-2296, U+263E;
+}
+
 html, body {
   height: 100%;
   overflow: hidden;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Symbols 2', sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-tap-highlight-color: transparent;
@@ -189,7 +207,7 @@ body {
   white-space: nowrap;
   color: var(--text-dim);
   font-size: 1.3rem;
-  font-family: monospace;
+  font-family: 'Noto Sans Symbols 2', monospace;
   animation: ticker-scroll 40s linear infinite;
 }
 
@@ -455,7 +473,7 @@ body {
 }
 
 .number-display.mono {
-  font-family: monospace;
+  font-family: 'Noto Sans Symbols 2', monospace;
 }
 
 .ticker .slavonic-font {
@@ -795,11 +813,17 @@ body {
   background: var(--bg-card);
   border-radius: 8px;
   padding: 16px;
-  font-family: monospace;
+  font-family: 'Noto Sans Symbols 2', monospace;
   font-size: 1.1rem;
   margin: 12px 0;
   text-align: center;
   letter-spacing: 2px;
+}
+
+.theory-unavailable {
+  text-align: center;
+  opacity: 0.65;
+  padding: 24px 0;
 }
 
 .theory-scroll .slavonic-font {

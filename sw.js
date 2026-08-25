@@ -1,4 +1,4 @@
-const CACHE_NAME = 'numnum-v27';
+const CACHE_NAME = 'numnum-v28';
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,6 +9,9 @@ const ASSETS = [
   '/icon.svg',
   '/icon-192.png',
   '/icon-512.png',
+  '/Ponomar-Regular.woff',
+  '/NotoSansSymbols2-subset.woff2',
+  '/NotoSansMath-subset.woff2',
   '/theory/base3.en.html',
   '/theory/base3.ru.html',
   '/theory/binary.en.html',
@@ -33,7 +36,15 @@ const ASSETS = [
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.allSettled(ASSETS.map(url => cache.add(url)))
+    ).then(results => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.warn('SW precache failed:', ASSETS[i], r.reason);
+        }
+      });
+    })
   );
   self.skipWaiting();
 });

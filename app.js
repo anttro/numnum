@@ -34,6 +34,7 @@ const STRINGS = {
     congratulations: 'Congratulations!',
     pleaseSelect: 'Please select all options',
     installApp: 'Install App',
+    theoryUnavailable: 'Content unavailable',
     sec: 'sec',
     chooseAnswer: 'Choose answer',
     enterEquivalent: 'Enter equivalent',
@@ -75,6 +76,7 @@ const STRINGS = {
     congratulations: '\u041F\u043E\u0437\u0434\u0440\u0430\u0432\u043B\u044F\u0435\u043C!',
     pleaseSelect: '\u041F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0441\u0435 \u043F\u0430\u0440\u0430\u043C\u0435\u0442\u0440\u044B',
     installApp: '\u0423\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435',
+    theoryUnavailable: '\u041C\u0430\u0442\u0435\u0440\u0438\u0430\u043B \u043D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D',
     sec: '\u0441\u0435\u043A',
     chooseAnswer: '\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043E\u0442\u0432\u0435\u0442',
     enterEquivalent: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0447\u0438\u0441\u043B\u043E',
@@ -111,6 +113,55 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.dataset.i18n);
   });
+}
+
+function refreshDynamicText() {
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+  switch (active.id) {
+    case 'screen-setup-system':
+      renderSetupSystem();
+      break;
+    case 'screen-setup-range':
+      renderSetupRange();
+      break;
+    case 'screen-setup-options':
+      document.querySelectorAll('#setup-modes .option-btn').forEach((btn, i) => {
+        btn.textContent = t(MODES[i].labelKey);
+      });
+      [...document.getElementById('setup-timing').options].forEach((opt, i) => {
+        opt.textContent = TIMINGS[i].value === 0 ? t('noLimit') : TIMINGS[i].value + ' ' + t('sec');
+      });
+      break;
+    case 'screen-theory-system':
+      renderTheorySystem();
+      break;
+    case 'screen-theory-content':
+      document.getElementById('theory-title').textContent = systemName(lastTheoryKey);
+      break;
+    case 'screen-game':
+      if (game.system && game.range) {
+        document.getElementById('score-system-range').textContent = systemName(game.system) + ': ' + game.range.label;
+      }
+      break;
+    case 'screen-results': {
+      const completed = game.currentRound >= game.rounds;
+      const total = completed ? game.rounds : game.currentRound;
+      const pct = total > 0 ? Math.round((game.correctCount / total) * 100) : 0;
+      document.getElementById('results-summary').innerHTML =
+        '<div class="big-number">' + game.correctCount + '/' + total + '</div>' +
+        '<div>' + t('pctCorrect', {pct: pct}) + '</div>';
+      const labelEl = document.getElementById('results-mistakes-label');
+      if (game.mistakes.length > 0 || labelEl.style.display !== 'none') {
+        labelEl.textContent = t('mistakes');
+      }
+      const congratsEl = document.getElementById('results-congrats');
+      if (congratsEl.textContent) {
+        congratsEl.textContent = t('congratulations');
+      }
+      break;
+    }
+  }
 }
 
 const SYSTEM_RANGES = {
@@ -188,6 +239,7 @@ const SYSTEM_GROUPS = {
 };
 
 const theoryCache = {};
+let lastTheoryKey = null;
 
 const MODES = [
   { labelKey: 'choose', value: 'choice' },
@@ -222,11 +274,19 @@ let game = {
 };
 
 let popstateHandled = false;
+let navDepth = 0;
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
-  if (id !== 'menu' && !popstateHandled) {
+  if (id === 'menu') {
+    if (navDepth > 0) {
+      const n = navDepth;
+      navDepth = 0;
+      history.go(-n);
+    }
+  } else if (!popstateHandled) {
+    navDepth++;
     history.pushState({ screen: id }, '');
   }
   popstateHandled = false;
@@ -354,7 +414,7 @@ const MARK_INCORRECT = '\u2717 ';
 function startGame() {
   lastSetupState = { ...setupState };
   game.system = setupState.system;
-  game.range = setupState.rangeData || RANGES[setupState.range];
+  game.range = setupState.rangeData;
   game.mode = MODES[setupState.mode]?.value ?? setupState.mode;
   game.timing = TIMINGS[setupState.timing]?.value ?? setupState.timing;
   game.rounds = ROUNDS[setupState.rounds];
@@ -754,12 +814,11 @@ function renderTheorySystem() {
 }
 
 async function showTheoryContent(key) {
+  lastTheoryKey = key;
   const html = await loadTheory(key);
-  if (!html) return;
-
   document.getElementById('theory-title').textContent = systemName(key);
-  document.getElementById('theory-scroll').innerHTML = html;
-
+  document.getElementById('theory-scroll').innerHTML =
+    html || '<div class="theory-unavailable">' + t('theoryUnavailable') + '</div>';
   showScreen('theory-content');
 }
 
@@ -790,9 +849,6 @@ function getPreferredTheme() {
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
 
-const isLightTheme = getPreferredTheme() === 'light';
-const TICKER_COLORS = isLightTheme ? TICKER_COLORS_LIGHT : TICKER_COLORS_DARK;
-
 const TICKER_SYSTEMS = [
   { key: 'binary',    min: 1,   max: 255,  suffix: toSubscript(2) },
   { key: 'base3',     min: 1,   max: 81,   suffix: toSubscript(3) },
@@ -806,6 +862,9 @@ const TICKER_SYSTEMS = [
 ];
 
 function generateTickerText() {
+  const palette = document.documentElement.dataset.theme === 'light'
+    ? TICKER_COLORS_LIGHT
+    : TICKER_COLORS_DARK;
   const pairs = [];
   let lastKey = null;
   let lastColor = null;
@@ -818,7 +877,7 @@ function generateTickerText() {
 
     let color;
     do {
-      color = TICKER_COLORS[Math.floor(Math.random() * TICKER_COLORS.length)];
+      color = palette[Math.floor(Math.random() * palette.length)];
     } while (color === lastColor);
     lastColor = color;
     const num = sys.min + Math.floor(Math.random() * (sys.max - sys.min + 1));
@@ -834,8 +893,10 @@ function generateTickerText() {
   return pairs.join('\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0');
 }
 
-const tickerText = generateTickerText();
-document.getElementById('ticker').innerHTML = tickerText + '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + tickerText;
+function refreshTicker() {
+  const tickerText = generateTickerText();
+  document.getElementById('ticker').innerHTML = tickerText + '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0' + tickerText;
+}
 
 const langSelect = document.getElementById('lang-select');
 langSelect.value = LANG;
@@ -843,6 +904,7 @@ langSelect.addEventListener('change', () => {
   LANG = langSelect.value;
   localStorage.setItem('numnum-lang', LANG);
   applyTranslations();
+  refreshDynamicText();
 });
 
 applyTranslations();
@@ -850,6 +912,7 @@ applyTranslations();
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   document.getElementById('theme-toggle').textContent = theme === 'dark' ? '\u2600' : '\u263E';
+  refreshTicker();
 }
 
 applyTheme(getPreferredTheme());
@@ -918,7 +981,8 @@ document.getElementById('btn-options-back').addEventListener('click', () => {
 });
 
 document.getElementById('btn-play').addEventListener('click', () => {
-  if (setupState.mode === undefined || setupState.timing === undefined || setupState.rounds === undefined) {
+  if (!setupState.system || !setupState.rangeData ||
+      setupState.mode === undefined || setupState.timing === undefined || setupState.rounds === undefined) {
     showSetupMessage(t('pleaseSelect'));
     return;
   }
@@ -997,6 +1061,7 @@ const BACK_MAP = {
 };
 
 window.addEventListener('popstate', () => {
+  navDepth = Math.max(0, navDepth - 1);
   const active = document.querySelector('.screen.active');
   if (!active) return;
 
