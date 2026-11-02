@@ -1,4 +1,4 @@
-const CACHE_NAME = 'numnum-v28';
+const CACHE_NAME = 'numnum-v29';
 const ASSETS = [
   '/',
   '/index.html',
@@ -12,6 +12,8 @@ const ASSETS = [
   '/Ponomar-Regular.woff',
   '/NotoSansSymbols2-subset.woff2',
   '/NotoSansMath-subset.woff2',
+  '/NotoSans-Greek-subset.woff2',
+  '/NotoSansHebrew-subset.woff2',
   '/theory/base3.en.html',
   '/theory/base3.ru.html',
   '/theory/binary.en.html',
